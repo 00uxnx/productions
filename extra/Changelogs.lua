@@ -1,8 +1,11 @@
-local changelogs = {} do
-  changelogs.Loader = {};
+local changelogs = {} 
+changelogs.ver = '2.1'
+
+changelogs.Loader = {};
   
-  changelogs.Vantage = {};
-  changelogs.Rivals = {};
-  changelogs.Doors = {};
-  
-end
+changelogs.Vantage = {};
+changelogs.Rivals = {};
+changelogs.Doors = {};
+
+
+return changelogs
