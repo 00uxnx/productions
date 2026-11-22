@@ -1501,26 +1501,26 @@ function Library:CreateWindow(settings)
 
     local main = create("Frame", {
         Name = "Main",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, 0.5),
+        AnchorPoint = Vector2.new(0, 0),
+        Position = settings.Position or UDim2.new(0.010704728, 0, 0.022, 0),
         Size = settings.Size or UDim2.fromOffset(446, 554),
-        BackgroundColor3 = Color3.fromRGB(5, 6, 8),
-        BackgroundTransparency = 0.08,
+        BackgroundColor3 = Color3.fromRGB(5, 5, 5),
+        BackgroundTransparency = 0.6,
         BorderSizePixel = 0
     }, gui)
     window.Main = main
-    addCorner(main, 6)
-    addStroke(main, Library.Theme.Border)
+    addStroke(main, Color3.fromRGB(0, 0, 0))
 
     local topbar = create("Frame", {
         Name = "Topbar",
         Size = UDim2.new(1, 0, 0, 70),
-        BackgroundColor3 = Color3.fromRGB(5, 5, 5),
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+        BackgroundTransparency = 0.1,
         BorderSizePixel = 0,
         Active = true
     }, main)
-    addCorner(topbar, 6)
     local topbarCover = create("Frame", {
+        Visible = false,
         BackgroundColor3 = Library.Theme.Panel,
         BorderSizePixel = 0,
         Position = UDim2.new(0, 0, 1, -8),
@@ -1548,13 +1548,14 @@ function Library:CreateWindow(settings)
     local title = create("TextLabel", {
         Name = "Title",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(10, 0),
-        Size = UDim2.new(0.7, -10, 1, 0),
-        Font = Enum.Font.GothamBold,
+        Position = UDim2.new(0, 0, 0.2, 0),
+        Size = UDim2.new(1, 0, 0.6, 0),
+        Font = Enum.Font.RobotoCondensed,
         Text = "UH.lua",
-        TextColor3 = Library.Theme.Text,
-        TextSize = 26,
-        TextXAlignment = Enum.TextXAlignment.Left
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextSize = 27,
+        TextScaled = true,
+        TextXAlignment = Enum.TextXAlignment.Center
     }, topbar)
     local topHint = create("TextLabel", {
         Name = "TopHint",
@@ -1562,8 +1563,8 @@ function Library:CreateWindow(settings)
         AnchorPoint = Vector2.new(1, 0),
         Position = UDim2.new(1, -14, 0, 0),
         Size = UDim2.fromOffset(210, 48),
-        Font = Enum.Font.Gotham,
-        Text = "UNNAMED HOOK  /  CLIENT",
+        Font = Enum.Font.RobotoCondensed,
+        Text = "",
         TextColor3 = Library.Theme.Muted,
         TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Right
@@ -1571,62 +1572,71 @@ function Library:CreateWindow(settings)
 
     local sidebar = create("Frame", {
         Name = "Sidebar",
-        Position = UDim2.fromOffset(0, 70),
-        Size = UDim2.new(0, 172, 1, -70),
-        BackgroundColor3 = Color3.fromRGB(7, 8, 10),
-        BackgroundTransparency = 0.05,
+        Position = UDim2.new(0, 0, 0, 57),
+        Size = UDim2.new(1, 0, 1, -57),
+        BackgroundTransparency = 1,
         BorderSizePixel = 0
     }, main)
     local sidebarLine = create("Frame", {
+        Visible = false,
         Position = UDim2.new(1, -1, 0, 0),
         Size = UDim2.new(0, 1, 1, 0),
         BackgroundColor3 = Library.Theme.Border,
         BorderSizePixel = 0
     }, sidebar)
-    local tabList = create("Frame", {
-        Name = "TabList",
+    local tabList = create("ScrollingFrame", {
+        Name = "tabs",
+        Active = true,
+        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        ScrollBarThickness = 0,
+        ScrollingDirection = Enum.ScrollingDirection.Y,
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(8, 10),
-        Size = UDim2.new(1, -16, 1, -20)
+        BorderSizePixel = 0,
+        Position = UDim2.new(0.011210762, 0, 0, 4),
+        Size = UDim2.new(0.977578461, 0, 1, -8)
     }, sidebar)
-    create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }, tabList)
+    create("UIListLayout", { Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder }, tabList)
+    create("UIPadding", { PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4) }, tabList)
     local sidebarFooter = create("TextLabel", {
-        Name = "Footer",
+        Visible = false,
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 10, 1, -32),
         Size = UDim2.new(1, -20, 0, 20),
-        Font = Enum.Font.Gotham,
+        Font = Enum.Font.RobotoCondensed,
         Text = "UH  •  BUILD 01",
         TextColor3 = Library.Theme.Muted,
         TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Left
     }, sidebar)
-
     local pageHolder = create("Frame", {
         Name = "PageHolder",
-        Position = UDim2.fromOffset(172, 70),
-        Size = UDim2.new(1, -172, 1, -102),
+        Position = UDim2.new(0, 0, 0, 57),
+        Size = UDim2.new(1, 0, 1, -57),
         BackgroundTransparency = 1,
-        ClipsDescendants = true
+        ClipsDescendants = true,
+        Visible = false
     }, main)
     local pageTitle = create("TextLabel", {
         Name = "PageTitle",
+        Visible = false,
         BackgroundTransparency = 1,
         Position = UDim2.fromOffset(12, 6),
         Size = UDim2.new(1, -24, 0, 28),
-        Font = Enum.Font.GothamBold,
-        Text = "PERSONAL MENU",
+        Font = Enum.Font.RobotoCondensed,
+        Text = "",
         TextColor3 = Library.Theme.Text,
         TextSize = 14,
         TextXAlignment = Enum.TextXAlignment.Left
     }, pageHolder)
     local pageSubtitle = create("TextLabel", {
         Name = "PageSubtitle",
+        Visible = false,
         BackgroundTransparency = 1,
         Position = UDim2.fromOffset(12, 32),
         Size = UDim2.new(1, -24, 0, 18),
-        Font = Enum.Font.Gotham,
-        Text = "Select a category to view available options",
+        Font = Enum.Font.RobotoCondensed,
+        Text = "",
         TextColor3 = Library.Theme.Muted,
         TextSize = 10,
         TextXAlignment = Enum.TextXAlignment.Left
@@ -1634,13 +1644,28 @@ function Library:CreateWindow(settings)
     local pages = create("Frame", {
         Name = "Pages",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(8, 56),
-        Size = UDim2.new(1, -16, 1, -63)
+        Position = UDim2.fromOffset(0, 0),
+        Size = UDim2.new(1, 0, 1, 0)
     }, pageHolder)
+    local backButton = create("TextButton", {
+        Name = "Back",
+        Size = UDim2.new(1, 0, 0, 34),
+        BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+        BackgroundTransparency = 0.05,
+        BorderSizePixel = 0,
+        AutoButtonColor = false,
+        Font = Enum.Font.RobotoCondensed,
+        Text = "<  BACK",
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextSize = 18,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 4
+    }, pages)
+    create("UIPadding", { PaddingLeft = UDim.new(0, 15) }, backButton)
     local footer = create("Frame", {
-        Name = "NavigationFooter",
-        Position = UDim2.new(0, 172, 1, -32),
-        Size = UDim2.new(1, -172, 0, 32),
+        Visible = false,
+        Position = UDim2.new(0, 0, 1, -32),
+        Size = UDim2.new(1, 0, 0, 32),
         BackgroundColor3 = Library.Theme.Panel,
         BorderSizePixel = 0
     }, main)
@@ -1648,8 +1673,8 @@ function Library:CreateWindow(settings)
         BackgroundTransparency = 1,
         Position = UDim2.fromOffset(14, 0),
         Size = UDim2.new(1, -28, 1, 0),
-        Font = Enum.Font.Gotham,
-        Text = "↑  ↓  SELECT     ←  →  ADJUST     ENTER  CONFIRM     RIGHT SHIFT  HIDE",
+        Font = Enum.Font.RobotoCondensed,
+        Text = "↑  ↓  SELECT     ENTER  OPEN     RIGHT SHIFT  HIDE",
         TextColor3 = Library.Theme.Muted,
         TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Left
@@ -1660,17 +1685,20 @@ function Library:CreateWindow(settings)
     window.FooterText = footerText
     window.TabList = tabList
     window.Pages = pages
+    window.PageHolder = pageHolder
+    window.InTabPage = false
+    window.SelectedTabIndex = 1
 
     function window:AddTab(name, icon)
         local tabNameValue = tostring(name)
         local iconName = resolveLucideIcon(tabNameValue, icon)
         local tabButton = create("TextButton", {
             Name = "Tab_" .. tabNameValue,
-            Size = UDim2.new(1, 0, 0, 34),
+            Size = UDim2.new(1, 0, 0.061, 0),
             BackgroundColor3 = Color3.fromRGB(0, 0, 0),
             BorderSizePixel = 0,
             AutoButtonColor = false,
-            Font = Enum.Font.GothamSemibold,
+            Font = Enum.Font.RobotoCondensed,
             Text = "",
             ZIndex = 2
         }, self.TabList)
@@ -1693,10 +1721,10 @@ function Library:CreateWindow(settings)
             BackgroundTransparency = 1,
             Position = UDim2.fromOffset(15, 0),
             Size = UDim2.new(1, -43, 1, 0),
-            Font = Enum.Font.GothamSemibold,
+            Font = Enum.Font.RobotoCondensed,
             Text = tabNameValue,
             TextColor3 = Library.Theme.Muted,
-            TextSize = 15,
+            TextSize = 20,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextTruncate = Enum.TextTruncate.AtEnd,
             ZIndex = 3
@@ -1737,7 +1765,8 @@ function Library:CreateWindow(settings)
             Name = "Content_" .. tostring(name),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            Size = UDim2.fromScale(1, 1),
+            Position = UDim2.fromOffset(0, 39),
+            Size = UDim2.new(1, 0, 1, -39),
             CanvasSize = UDim2.new(0, 0, 0, 0),
             ScrollBarThickness = 3,
             ScrollBarImageColor3 = Library.Theme.Accent,
@@ -1756,33 +1785,53 @@ function Library:CreateWindow(settings)
             self:SelectTab(tab)
         end)
         Library:BindTheme(function(theme)
-            tabButton.BackgroundColor3 = self.CurrentTab == tab and Color3.fromRGB(22, 34, 68) or Color3.fromRGB(0, 0, 0)
-            tabName.Text = (self.CurrentTab == tab and "> " or "  ") .. tabNameValue
-            tabName.Text = self.CurrentTab == tab and ("> " .. tabNameValue) or tabNameValue
-            tabName.TextColor3 = self.CurrentTab == tab and theme.Text or theme.Muted
+            local activeRow = self.SelectedTabIndex == table.find(self.Tabs, tab) and not self.InTabPage
+            tabButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            tabName.Text = activeRow and ("> " .. tabNameValue) or tabNameValue
+            tabName.TextColor3 = activeRow and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(190, 190, 190)
             marker.TextColor3 = theme.Accent
-            tabIcon.ImageColor3 = self.CurrentTab == tab and theme.Accent or theme.Muted
-            iconFallback.TextColor3 = self.CurrentTab == tab and theme.Accent or theme.Muted
+            tabIcon.ImageColor3 = activeRow and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(175, 175, 175)
+            iconFallback.TextColor3 = activeRow and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(175, 175, 175)
             content.ScrollBarImageColor3 = theme.Accent
         end)
         if #self.Tabs == 1 then
-            self:SelectTab(tab)
+            self.SelectedTabIndex = 1
+            self:ShowTabList()
         end
         return tab
+    end
+
+    function window:ShowTabList()
+        self.InTabPage = false
+        self.CurrentTab = nil
+        self.PageHolder.Visible = false
+        self.TabList.Parent.Visible = true
+        self.SelectedTabIndex = math.clamp(self.SelectedTabIndex or 1, 1, math.max(#self.Tabs, 1))
+        for index, item in ipairs(self.Tabs) do
+            item.Button.BackgroundColor3 = index == self.SelectedTabIndex and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(0, 0, 0)
+            item.TabName.Text = index == self.SelectedTabIndex and ("> " .. item.Name) or item.Name
+            item.TabName.TextColor3 = index == self.SelectedTabIndex and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(190, 190, 190)
+            item.Icon.ImageColor3 = index == self.SelectedTabIndex and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(175, 175, 175)
+            item.IconFallback.TextColor3 = index == self.SelectedTabIndex and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(175, 175, 175)
+        end
+        self.FooterText.Text = "↑  ↓  SELECT     ENTER  OPEN     RIGHT SHIFT  HIDE"
     end
 
     function window:SelectTab(tabOrName)
         local tab = tabOrName
         if type(tabOrName) == "string" then
-            for _, item in ipairs(self.Tabs) do
+            for index, item in ipairs(self.Tabs) do
                 if item.Name == tabOrName then
                     tab = item
+                    self.SelectedTabIndex = index
                     break
                 end
             end
-        end
-        if type(tabOrName) == "number" then
+        elseif type(tabOrName) == "number" then
             tab = self.Tabs[tabOrName]
+            self.SelectedTabIndex = tabOrName
+        else
+            self.SelectedTabIndex = table.find(self.Tabs, tab) or 1
         end
         if not tab then
             return false
@@ -1791,19 +1840,16 @@ function Library:CreateWindow(settings)
             self.CurrentTab.FocusedControl:SetFocused(false)
         end
         self.CurrentTab = tab
+        self.InTabPage = true
+        self.TabList.Parent.Visible = false
+        self.PageHolder.Visible = true
         for _, item in ipairs(self.Tabs) do
-            local active = item == tab
-            item.Content.Visible = active
-            item.Marker.Visible = false
-            item.Marker.Text = ""
-            item.Button.BackgroundColor3 = active and Color3.fromRGB(22, 34, 68) or Color3.fromRGB(0, 0, 0)
-            item.TabName.Text = active and ("> " .. item.Name) or item.Name
-            item.TabName.TextColor3 = active and Library.Theme.Text or Library.Theme.Muted
-            item.Icon.ImageColor3 = active and Library.Theme.Accent or Library.Theme.Muted
-            item.IconFallback.TextColor3 = active and Library.Theme.Accent or Library.Theme.Muted
+            item.Content.Visible = item == tab
         end
-        self.PageTitle.Text = tab.Name:upper()
-        self.PageSubtitle.Text = "Use the arrow keys to navigate and enter to confirm"
+        self.PageTitle.Text = tab.Name
+        self.PageSubtitle.Text = ""
+        self.BackButton.Visible = true
+        self.FooterText.Text = "ESC  BACK     ↑  ↓  SELECT     ←  →  ADJUST"
         if #tab.Controls > 0 then
             tab:FocusControl(math.clamp(tab.SelectedIndex or 1, 1, #tab.Controls))
         else
@@ -1811,6 +1857,11 @@ function Library:CreateWindow(settings)
         end
         return true
     end
+
+    backButton.Activated:Connect(function()
+        window:ShowTabList()
+    end)
+    window.BackButton = backButton
 
     local movementActionName = "UH_BlockPlayerMovement"
     local movementKeys = {
@@ -1890,7 +1941,7 @@ function Library:CreateWindow(settings)
         end
         local watermark = create("Frame", {
             Name = "UH_Watermark",
-            Position = UDim2.fromOffset(14, 14),
+            Position = UDim2.new(0.0107, 0, 0.022, 0),
             Size = UDim2.fromOffset(220, 28),
             BackgroundColor3 = Library.Theme.Panel,
             BorderSizePixel = 0
@@ -2031,29 +2082,34 @@ function Library:CreateWindow(settings)
             window.ColorPickerOpen:ClosePopup()
             return
         end
-        if window.SelectionMode == "Normal" and window.CurrentTab then
-            local tab = window.CurrentTab
+        if window.SelectionMode == "Normal" then
             local key = input.KeyCode
-            if key == Enum.KeyCode.Up or key == Enum.KeyCode.W then
-                tab:MoveSelection(-1)
-            elseif key == Enum.KeyCode.Down or key == Enum.KeyCode.S then
-                tab:MoveSelection(1)
-            elseif key == Enum.KeyCode.Left or key == Enum.KeyCode.A then
-                if window.FocusedControl and window.FocusedControl.Adjust then
-                    window.FocusedControl:Adjust(-1)
+            if not window.InTabPage then
+                if #window.Tabs == 0 then return end
+                if key == Enum.KeyCode.Up or key == Enum.KeyCode.W then
+                    window.SelectedTabIndex = ((window.SelectedTabIndex or 1) - 2) % #window.Tabs + 1
+                    window:ShowTabList()
+                elseif key == Enum.KeyCode.Down or key == Enum.KeyCode.S then
+                    window.SelectedTabIndex = (window.SelectedTabIndex or 1) % #window.Tabs + 1
+                    window:ShowTabList()
+                elseif key == Enum.KeyCode.Return or key == Enum.KeyCode.KeypadEnter or key == Enum.KeyCode.Space then
+                    window:SelectTab(window.SelectedTabIndex or 1)
                 end
-            elseif key == Enum.KeyCode.Right or key == Enum.KeyCode.D then
-                if window.FocusedControl and window.FocusedControl.Adjust then
-                    window.FocusedControl:Adjust(1)
+            elseif window.CurrentTab then
+                local tab = window.CurrentTab
+                if key == Enum.KeyCode.Escape or key == Enum.KeyCode.Backspace or key == Enum.KeyCode.Left then
+                    window:ShowTabList()
+                elseif key == Enum.KeyCode.Up or key == Enum.KeyCode.W then
+                    tab:MoveSelection(-1)
+                elseif key == Enum.KeyCode.Down or key == Enum.KeyCode.S then
+                    tab:MoveSelection(1)
+                elseif key == Enum.KeyCode.Left or key == Enum.KeyCode.A then
+                    if window.FocusedControl and window.FocusedControl.Adjust then window.FocusedControl:Adjust(-1) end
+                elseif key == Enum.KeyCode.Right or key == Enum.KeyCode.D then
+                    if window.FocusedControl and window.FocusedControl.Adjust then window.FocusedControl:Adjust(1) end
+                elseif key == Enum.KeyCode.Return or key == Enum.KeyCode.KeypadEnter or key == Enum.KeyCode.Space then
+                    if window.FocusedControl and window.FocusedControl.Activate then window.FocusedControl:Activate() end
                 end
-            elseif key == Enum.KeyCode.Return or key == Enum.KeyCode.KeypadEnter or key == Enum.KeyCode.Space then
-                if window.FocusedControl and window.FocusedControl.Activate then
-                    window.FocusedControl:Activate()
-                end
-            elseif key == Enum.KeyCode.Tab then
-                local index = table.find(window.Tabs, window.CurrentTab) or 1
-                index = index % #window.Tabs + 1
-                window:SelectTab(index)
             end
         end
     end
@@ -2108,11 +2164,11 @@ function Library:CreateWindow(settings)
     end))
 
     Library:BindTheme(function(theme)
-        main.BackgroundColor3 = theme.Background
-        topbar.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+        main.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+        topbar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         topbarCover.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
         logo.TextColor3 = theme.Accent
-        title.TextColor3 = theme.Text
+        title.TextColor3 = Color3.fromRGB(255, 255, 255)
         topHint.TextColor3 = theme.Muted
         sidebar.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
         sidebarLine.BackgroundColor3 = theme.Border
