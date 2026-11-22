@@ -202,7 +202,7 @@ local Footer = Create("TextLabel", {
     TextSize = 12,
     TextColor3 = Theme.TextDim,
     TextXAlignment = Enum.TextXAlignment.Left,
-    Text = "Select: [Enter] | Back: [Backspace] | Tab: [Tab/Shift] | Toggle: [M]"
+    Text = "Select: [Enter] | Back: [Backspace] | Tab: [Tab] | Toggle: [M]"
 })
 
 local dragging, dragInput, dragStart, startPos
@@ -243,78 +243,41 @@ end
 local function UpdateOptionSelection()
     for i, btn in next, UH.ActiveOptionButtons do
         if i == UH.SelectedOption then
-            btn.BackgroundTransparency = 0
-            btn.BackgroundColor3 = Theme.Accent
+            btn.Button.BackgroundTransparency = 0
+            btn.Button.BackgroundColor3 = Theme.Accent
         else
-            btn.BackgroundTransparency = 1
-            btn.BackgroundColor3 = Theme.Background
+            btn.Button.BackgroundTransparency = 1
+            btn.Button.BackgroundColor3 = Theme.Background
         end
     end
 end
 
-local function RenderCategories()
-    for _, v in next, TabPanel:GetChildren() do
-        if v:IsA("TextButton") then v:Destroy() end
+local function GetElementText(item)
+    if item.Type == "Toggle" then
+        return string.format("[%s] %s", item.Value and "X" or " ", item.Label)
+    elseif item.Type == "Slider" then
+        return string.format("%s: < %s >", item.Label, ToString(item.Value))
+    elseif item.Type == "Dropdown" then
+        return string.format("%s: < %s >", item.Label, ToString(item.Value))
+    elseif item.Type == "Keypicker" then
+        return string.format("%s: [ %s ]", item.Label, item.Value and item.Value.Name or "None")
+    elseif item.Type == "Colorpicker" then
+        local c = item.Value
+        return string.format("%s: [%d, %d, %d]", item.Label, c.R * 255, c.G * 255, c.B * 255)
     end
-    UH.ActiveTabButtons = {}
-    
-    for i, cat in next, UH.Categories do
-        local btn = Create("TextButton", {
-            Parent = TabPanel,
-            BackgroundColor3 = Theme.Background,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Size = UDim2New(1, 0, 0, 24),
-            Font = Theme.Font,
-            TextSize = 14,
-            TextColor3 = Theme.Text,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Text = cat.Name,
-            AutoButtonColor = false
-        })
-        TableInsert(UH.ActiveTabButtons, btn)
-        
-        AddConnection(btn.MouseButton1Click:Connect(function()
-            UH.SelectedTab = i
-            UH.SelectedOption = 1
-            UH.CurrentCategory = cat
-            UpdateTabSelection()
-            RenderOptions()
-            PlaySound()
-        end))
-    end
-    
-    if not UH.CurrentCategory and #UH.Categories > 0 then
-        UH.CurrentCategory = UH.Categories[1]
-        UH.SelectedTab = 1
-    end
-    UpdateTabSelection()
-    RenderOptions()
+    return item.Label or "Unknown"
 end
 
-local function RenderOptions()
+local RenderOptions
+local RenderCategories
+
+RenderOptions = function()
     for _, v in next, OptionPanel:GetChildren() do
         if v:IsA("TextButton") then v:Destroy() end
     end
     UH.ActiveOptionButtons = {}
     
     if not UH.CurrentCategory then return end
-    
-    local function GetElementText(item)
-        if item.Type == "Toggle" then
-            return string.format("[%s] %s", item.Value and "X" or " ", item.Label)
-        elseif item.Type == "Slider" then
-            return string.format("%s: < %s >", item.Label, ToString(item.Value))
-        elseif item.Type == "Dropdown" then
-            return string.format("%s: < %s >", item.Label, ToString(item.Value))
-        elseif item.Type == "Keypicker" then
-            return string.format("%s: [ %s ]", item.Label, item.Value and item.Value.Name or "None")
-        elseif item.Type == "Colorpicker" then
-            local c = item.Value
-            return string.format("%s: [%d, %d, %d]", item.Label, c.R * 255, c.G * 255, c.B * 255)
-        end
-        return item.Label or "Unknown"
-    end
 
     local function AddOptionButton(text, activate, left, right)
         local btn = Create("TextButton", {
@@ -342,6 +305,7 @@ local function RenderOptions()
                 end
             end
         end))
+        return el
     end
     
     for _, sub in next, UH.CurrentCategory.Submenus do
@@ -351,11 +315,14 @@ local function RenderOptions()
                 if v:IsA("TextButton") then v:Destroy() end
             end
             AddOptionButton("< Back", function() RenderOptions() end)
+            
             for _, item in next, sub.Elements do
+                local elRef
                 local function updateText()
-                    UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = GetElementText(item)
+                    if elRef then elRef.Button.Text = GetElementText(item) end
                 end
-                AddOptionButton(GetElementText(item), function()
+                
+                elRef = AddOptionButton(GetElementText(item), function()
                     if item.Type == "Toggle" then
                         item.Value = not item.Value
                         updateText()
@@ -364,7 +331,7 @@ local function RenderOptions()
                         if item.Callback then task.spawn(item.Callback) end
                     elseif item.Type == "Keypicker" then
                         UH.WaitingForKey = item
-                        UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = string.format("%s: [ Press Key ]", item.Label)
+                        if elRef then elRef.Button.Text = string.format("%s: [ Press Key ]", item.Label) end
                     elseif item.Type == "Colorpicker" then
                         item.Value = Color3.fromHSV(math.random(), 1, 1)
                         updateText()
@@ -402,10 +369,12 @@ local function RenderOptions()
     end
     
     for _, item in next, UH.CurrentCategory.Elements do
+        local elRef
         local function updateText()
-            UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = GetElementText(item)
+            if elRef then elRef.Button.Text = GetElementText(item) end
         end
-        AddOptionButton(GetElementText(item), function()
+        
+        elRef = AddOptionButton(GetElementText(item), function()
             if item.Type == "Toggle" then
                 item.Value = not item.Value
                 updateText()
@@ -414,7 +383,7 @@ local function RenderOptions()
                 if item.Callback then task.spawn(item.Callback) end
             elseif item.Type == "Keypicker" then
                 UH.WaitingForKey = item
-                UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = string.format("%s: [ Press Key ]", item.Label)
+                if elRef then elRef.Button.Text = string.format("%s: [ Press Key ]", item.Label) end
             elseif item.Type == "Colorpicker" then
                 item.Value = Color3.fromHSV(math.random(), 1, 1)
                 updateText()
@@ -449,6 +418,46 @@ local function RenderOptions()
     
     UH.SelectedOption = 1
     UpdateOptionSelection()
+end
+
+RenderCategories = function()
+    for _, v in next, TabPanel:GetChildren() do
+        if v:IsA("TextButton") then v:Destroy() end
+    end
+    UH.ActiveTabButtons = {}
+    
+    for i, cat in next, UH.Categories do
+        local btn = Create("TextButton", {
+            Parent = TabPanel,
+            BackgroundColor3 = Theme.Background,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Size = UDim2New(1, 0, 0, 24),
+            Font = Theme.Font,
+            TextSize = 14,
+            TextColor3 = Theme.Text,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Text = cat.Name,
+            AutoButtonColor = false
+        })
+        TableInsert(UH.ActiveTabButtons, btn)
+        
+        AddConnection(btn.MouseButton1Click:Connect(function()
+            UH.SelectedTab = i
+            UH.SelectedOption = 1
+            UH.CurrentCategory = cat
+            UpdateTabSelection()
+            RenderOptions()
+            PlaySound()
+        end))
+    end
+    
+    if not UH.CurrentCategory and #UH.Categories > 0 then
+        UH.CurrentCategory = UH.Categories[1]
+        UH.SelectedTab = 1
+    end
+    UpdateTabSelection()
+    RenderOptions()
 end
 
 function UH:CreateWindow(title)
