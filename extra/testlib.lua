@@ -26,11 +26,12 @@ UH.Flags = {}
 UH.Connections = {}
 UH.SelectionMode = "Normal"
 UH.MenuKeybind = Enum.KeyCode.M
-UH.SelectedIndex = 1
 UH.ActiveElements = {}
 UH.IsOpen = true
 UH.WaitingForKey = nil
 UH.Controls = nil
+UH.SelectedTab = 1
+UH.SelectedOption = 1
 
 local Theme = {
     Background = Color3RGB(15, 15, 15),
@@ -46,11 +47,12 @@ local Theme = {
 
 local SelectSound = InstanceNew("Sound")
 SelectSound.SoundId = "rbxassetid://6895079853"
-SelectSound.Volume = 0.4
+SelectSound.Volume = 0.5
 SelectSound.Parent = SoundService
 
 local function PlaySound()
     if SelectSound then
+        SelectSound.TimePosition = 0
         SelectSound:Play()
     end
 end
@@ -75,11 +77,7 @@ local function ToggleControls(enable)
         end)
     end
     if UH.Controls then
-        if enable then
-            UH.Controls:Enable()
-        else
-            UH.Controls:Disable()
-        end
+        if enable then UH.Controls:Enable() else UH.Controls:Disable() end
     end
 end
 
@@ -120,7 +118,7 @@ local Main = Create("Frame", {
     BorderSizePixel = 1,
     BorderColor3 = Theme.Outline,
     Position = UDim2New(0, 50, 0, 100),
-    Size = UDim2New(0, 550, 0, 400),
+    Size = UDim2New(0, 600, 0, 400),
     Visible = true,
     Active = true
 })
@@ -146,16 +144,33 @@ local HeaderText = Create("TextLabel", {
     Text = "UNNAMED HOOK"
 })
 
-local LeftPanel = Create("Frame", {
+local TabPanel = Create("Frame", {
     Parent = Main,
-    Name = "LeftPanel",
-    BackgroundTransparency = 1,
+    Name = "TabPanel",
+    BackgroundColor3 = Theme.Panel,
+    BackgroundTransparency = Theme.Transparency,
+    BorderSizePixel = 1,
+    BorderColor3 = Theme.Outline,
     Position = UDim2New(0, 5, 0, 30),
-    Size = UDim2New(0, 260, 0, 340)
+    Size = UDim2New(0, 140, 0, 340)
 })
 
-local LeftLayout = Create("UIListLayout", {
-    Parent = LeftPanel,
+local TabLayout = Create("UIListLayout", {
+    Parent = TabPanel,
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    Padding = UDim.new(0, 2)
+})
+
+local OptionPanel = Create("Frame", {
+    Parent = Main,
+    Name = "OptionPanel",
+    BackgroundTransparency = 1,
+    Position = UDim2New(0, 150, 0, 30),
+    Size = UDim2New(0, 200, 0, 340)
+})
+
+local OptionLayout = Create("UIListLayout", {
+    Parent = OptionPanel,
     SortOrder = Enum.SortOrder.LayoutOrder,
     Padding = UDim.new(0, 2)
 })
@@ -167,8 +182,8 @@ local RightPanel = Create("Frame", {
     BackgroundTransparency = Theme.Transparency,
     BorderSizePixel = 1,
     BorderColor3 = Theme.Outline,
-    Position = UDim2New(0, 270, 0, 30),
-    Size = UDim2New(0, 275, 0, 340)
+    Position = UDim2New(0, 355, 0, 30),
+    Size = UDim2New(0, 240, 0, 340)
 })
 
 local RightLayout = Create("UIListLayout", {
@@ -187,7 +202,7 @@ local Footer = Create("TextLabel", {
     TextSize = 12,
     TextColor3 = Theme.TextDim,
     TextXAlignment = Enum.TextXAlignment.Left,
-    Text = "Select: [Enter] | Back: [Backspace] | Toggle: [M]"
+    Text = "Select: [Enter] | Back: [Backspace] | Tab: [Tab/Shift] | Toggle: [M]"
 })
 
 local dragging, dragInput, dragStart, startPos
@@ -199,9 +214,7 @@ AddConnection(Header.InputBegan:Connect(function(input)
     end
 end))
 AddConnection(Header.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
 end))
 AddConnection(UserInputService.InputChanged:Connect(function(input)
     if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
@@ -210,176 +223,232 @@ AddConnection(UserInputService.InputChanged:Connect(function(input)
     end
 end))
 
-local Pages = {}
-local CurrentPage = nil
-local CurrentSubmenu = nil
+UH.Categories = {}
+UH.CurrentCategory = nil
+UH.ActiveTabButtons = {}
+UH.ActiveOptionButtons = {}
 
-local function ClearUI()
-    for _, v in next, LeftPanel:GetChildren() do
+local function UpdateTabSelection()
+    for i, btn in next, UH.ActiveTabButtons do
+        if i == UH.SelectedTab then
+            btn.BackgroundTransparency = 0
+            btn.BackgroundColor3 = Theme.Accent
+        else
+            btn.BackgroundTransparency = 1
+            btn.BackgroundColor3 = Theme.Background
+        end
+    end
+end
+
+local function UpdateOptionSelection()
+    for i, btn in next, UH.ActiveOptionButtons do
+        if i == UH.SelectedOption then
+            btn.BackgroundTransparency = 0
+            btn.BackgroundColor3 = Theme.Accent
+        else
+            btn.BackgroundTransparency = 1
+            btn.BackgroundColor3 = Theme.Background
+        end
+    end
+end
+
+local function RenderCategories()
+    for _, v in next, TabPanel:GetChildren() do
         if v:IsA("TextButton") then v:Destroy() end
     end
-    UH.ActiveElements = {}
-    UH.SelectedIndex = 1
-end
-
-local function UpdateSelection()
-    for i, el in next, UH.ActiveElements do
-        if el.Frame then
-            if i == UH.SelectedIndex then
-                el.Frame.BackgroundTransparency = 0
-                el.Frame.BackgroundColor3 = Theme.Accent
-            else
-                el.Frame.BackgroundTransparency = 1
-                el.Frame.BackgroundColor3 = Theme.Background
-            end
-        end
+    UH.ActiveTabButtons = {}
+    
+    for i, cat in next, UH.Categories do
+        local btn = Create("TextButton", {
+            Parent = TabPanel,
+            BackgroundColor3 = Theme.Background,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Size = UDim2New(1, 0, 0, 24),
+            Font = Theme.Font,
+            TextSize = 14,
+            TextColor3 = Theme.Text,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Text = cat.Name,
+            AutoButtonColor = false
+        })
+        TableInsert(UH.ActiveTabButtons, btn)
+        
+        AddConnection(btn.MouseButton1Click:Connect(function()
+            UH.SelectedTab = i
+            UH.SelectedOption = 1
+            UH.CurrentCategory = cat
+            UpdateTabSelection()
+            RenderOptions()
+            PlaySound()
+        end))
     end
-end
-
-local function CreateElement(text, activate, left, right)
-    local btn = Create("TextButton", {
-        Parent = LeftPanel,
-        BackgroundColor3 = Theme.Background,
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Size = UDim2New(1, 0, 0, 24),
-        Font = Theme.Font,
-        TextSize = Theme.TextSize,
-        TextColor3 = Theme.Text,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Text = text,
-        AutoButtonColor = false
-    })
-    local el = { Frame = btn, Activate = activate, Left = left, Right = right }
-    TableInsert(UH.ActiveElements, el)
-    AddConnection(btn.MouseButton1Click:Connect(function()
-        for i, v in next, UH.ActiveElements do
-            if v == el then
-                UH.SelectedIndex = i
-                UpdateSelection()
-                PlaySound()
-                if el.Activate then el.Activate() end
-            end
-        end
-    end))
-    return el
-end
-
-local function GetElementText(item)
-    if item.Type == "Toggle" then
-        return string.format("[%s] %s", item.Value and "X" or " ", item.Label)
-    elseif item.Type == "Slider" then
-        return string.format("%s: < %s >", item.Label, ToString(item.Value))
-    elseif item.Type == "Dropdown" then
-        return string.format("%s: < %s >", item.Label, ToString(item.Value))
-    elseif item.Type == "Keypicker" then
-        return string.format("%s: [ %s ]", item.Label, item.Value and item.Value.Name or "None")
-    elseif item.Type == "Colorpicker" then
-        local c = item.Value
-        return string.format("%s: [ %d, %d, %d ]", item.Label, c.R * 255, c.G * 255, c.B * 255)
+    
+    if not UH.CurrentCategory and #UH.Categories > 0 then
+        UH.CurrentCategory = UH.Categories[1]
+        UH.SelectedTab = 1
     end
-    return item.Label or "Unknown"
+    UpdateTabSelection()
+    RenderOptions()
 end
 
-local function BuildPage(pageData)
-    ClearUI()
-    CurrentSubmenu = nil
-    HeaderText.Text = "UNNAMED HOOK // " .. string.upper(pageData.Name)
-    for _, sub in next, pageData.Submenus do
-        CreateElement(sub.Name .. " >", function()
-            CurrentSubmenu = sub
-            ClearUI()
-            local backEl = CreateElement("< Back", function() BuildPage(pageData) end)
+local function RenderOptions()
+    for _, v in next, OptionPanel:GetChildren() do
+        if v:IsA("TextButton") then v:Destroy() end
+    end
+    UH.ActiveOptionButtons = {}
+    
+    if not UH.CurrentCategory then return end
+    
+    local function GetElementText(item)
+        if item.Type == "Toggle" then
+            return string.format("[%s] %s", item.Value and "X" or " ", item.Label)
+        elseif item.Type == "Slider" then
+            return string.format("%s: < %s >", item.Label, ToString(item.Value))
+        elseif item.Type == "Dropdown" then
+            return string.format("%s: < %s >", item.Label, ToString(item.Value))
+        elseif item.Type == "Keypicker" then
+            return string.format("%s: [ %s ]", item.Label, item.Value and item.Value.Name or "None")
+        elseif item.Type == "Colorpicker" then
+            local c = item.Value
+            return string.format("%s: [%d, %d, %d]", item.Label, c.R * 255, c.G * 255, c.B * 255)
+        end
+        return item.Label or "Unknown"
+    end
+
+    local function AddOptionButton(text, activate, left, right)
+        local btn = Create("TextButton", {
+            Parent = OptionPanel,
+            BackgroundColor3 = Theme.Background,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Size = UDim2New(1, 0, 0, 24),
+            Font = Theme.Font,
+            TextSize = 14,
+            TextColor3 = Theme.Text,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Text = text,
+            AutoButtonColor = false
+        })
+        local el = { Button = btn, Activate = activate, Left = left, Right = right }
+        TableInsert(UH.ActiveOptionButtons, el)
+        AddConnection(btn.MouseButton1Click:Connect(function()
+            for i, v in next, UH.ActiveOptionButtons do
+                if v == el then
+                    UH.SelectedOption = i
+                    UpdateOptionSelection()
+                    PlaySound()
+                    if el.Activate then el.Activate() end
+                end
+            end
+        end))
+    end
+    
+    for _, sub in next, UH.CurrentCategory.Submenus do
+        AddOptionButton(sub.Name .. " >", function()
+            UH.ActiveOptionButtons = {}
+            for _, v in next, OptionPanel:GetChildren() do
+                if v:IsA("TextButton") then v:Destroy() end
+            end
+            AddOptionButton("< Back", function() RenderOptions() end)
             for _, item in next, sub.Elements do
-                local el = CreateElement(GetElementText(item), function()
+                local function updateText()
+                    UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = GetElementText(item)
+                end
+                AddOptionButton(GetElementText(item), function()
                     if item.Type == "Toggle" then
                         item.Value = not item.Value
-                        el.Frame.Text = GetElementText(item)
+                        updateText()
                         if item.Callback then task.spawn(item.Callback, item.Value) end
                     elseif item.Type == "Button" then
                         if item.Callback then task.spawn(item.Callback) end
                     elseif item.Type == "Keypicker" then
                         UH.WaitingForKey = item
-                        el.Frame.Text = string.format("%s: [ Press Key ]", item.Label)
+                        UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = string.format("%s: [ Press Key ]", item.Label)
                     elseif item.Type == "Colorpicker" then
                         item.Value = Color3.fromHSV(math.random(), 1, 1)
-                        el.Frame.Text = GetElementText(item)
+                        updateText()
                         if item.Callback then task.spawn(item.Callback, item.Value) end
                     end
                 end, function()
                     if item.Type == "Slider" then
                         item.Value = MathClamp(item.Value - item.Step, item.Min, item.Max)
-                        el.Frame.Text = GetElementText(item)
+                        updateText()
                         if item.Callback then task.spawn(item.Callback, item.Value) end
                     elseif item.Type == "Dropdown" then
                         local idx = table.find(item.Options, item.Value) or 1
                         idx = idx > 1 and idx - 1 or #item.Options
                         item.Value = item.Options[idx]
-                        el.Frame.Text = GetElementText(item)
+                        updateText()
                         if item.Callback then task.spawn(item.Callback, item.Value) end
                     end
                 end, function()
                     if item.Type == "Slider" then
                         item.Value = MathClamp(item.Value + item.Step, item.Min, item.Max)
-                        el.Frame.Text = GetElementText(item)
+                        updateText()
                         if item.Callback then task.spawn(item.Callback, item.Value) end
                     elseif item.Type == "Dropdown" then
                         local idx = table.find(item.Options, item.Value) or 0
                         idx = idx < #item.Options and idx + 1 or 1
                         item.Value = item.Options[idx]
-                        el.Frame.Text = GetElementText(item)
+                        updateText()
                         if item.Callback then task.spawn(item.Callback, item.Value) end
                     end
                 end)
-                item.Frame = el.Frame
             end
-            UpdateSelection()
+            UH.SelectedOption = 1
+            UpdateOptionSelection()
         end)
     end
-    for _, item in next, pageData.Elements do
-        local el = CreateElement(GetElementText(item), function()
+    
+    for _, item in next, UH.CurrentCategory.Elements do
+        local function updateText()
+            UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = GetElementText(item)
+        end
+        AddOptionButton(GetElementText(item), function()
             if item.Type == "Toggle" then
                 item.Value = not item.Value
-                el.Frame.Text = GetElementText(item)
+                updateText()
                 if item.Callback then task.spawn(item.Callback, item.Value) end
             elseif item.Type == "Button" then
                 if item.Callback then task.spawn(item.Callback) end
             elseif item.Type == "Keypicker" then
                 UH.WaitingForKey = item
-                el.Frame.Text = string.format("%s: [ Press Key ]", item.Label)
+                UH.ActiveOptionButtons[#UH.ActiveOptionButtons].Button.Text = string.format("%s: [ Press Key ]", item.Label)
             elseif item.Type == "Colorpicker" then
                 item.Value = Color3.fromHSV(math.random(), 1, 1)
-                el.Frame.Text = GetElementText(item)
+                updateText()
                 if item.Callback then task.spawn(item.Callback, item.Value) end
             end
         end, function()
             if item.Type == "Slider" then
                 item.Value = MathClamp(item.Value - item.Step, item.Min, item.Max)
-                el.Frame.Text = GetElementText(item)
+                updateText()
                 if item.Callback then task.spawn(item.Callback, item.Value) end
             elseif item.Type == "Dropdown" then
                 local idx = table.find(item.Options, item.Value) or 1
                 idx = idx > 1 and idx - 1 or #item.Options
                 item.Value = item.Options[idx]
-                el.Frame.Text = GetElementText(item)
+                updateText()
                 if item.Callback then task.spawn(item.Callback, item.Value) end
             end
         end, function()
             if item.Type == "Slider" then
                 item.Value = MathClamp(item.Value + item.Step, item.Min, item.Max)
-                el.Frame.Text = GetElementText(item)
+                updateText()
                 if item.Callback then task.spawn(item.Callback, item.Value) end
             elseif item.Type == "Dropdown" then
                 local idx = table.find(item.Options, item.Value) or 0
                 idx = idx < #item.Options and idx + 1 or 1
                 item.Value = item.Options[idx]
-                el.Frame.Text = GetElementText(item)
+                updateText()
                 if item.Callback then task.spawn(item.Callback, item.Value) end
             end
         end)
-        item.Frame = el.Frame
     end
-    UpdateSelection()
+    
+    UH.SelectedOption = 1
+    UpdateOptionSelection()
 end
 
 function UH:CreateWindow(title)
@@ -388,10 +457,10 @@ function UH:CreateWindow(title)
 end
 
 function UH:AddCategory(name)
-    if not Pages[name] then
-        Pages[name] = { Name = name, Elements = {}, Submenus = {} }
-    end
-    return Pages[name]
+    local cat = { Name = name, Elements = {}, Submenus = {} }
+    TableInsert(self.Categories, cat)
+    RenderCategories()
+    return cat
 end
 
 function UH:AddSubmenu(category, name)
@@ -519,11 +588,11 @@ AddConnection(UserInputService.InputBegan:Connect(function(input, gameProcessed)
     
     if UH.WaitingForKey then
         UH.WaitingForKey.Value = input.KeyCode
-        UH.WaitingForKey.Frame.Text = GetElementText(UH.WaitingForKey)
         if UH.WaitingForKey.Callback then
             task.spawn(UH.WaitingForKey.Callback, input.KeyCode)
         end
         UH.WaitingForKey = nil
+        RenderOptions()
         return
     end
     
@@ -531,28 +600,33 @@ AddConnection(UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if UserInputService:GetFocusedTextBox() then return end
     
     if input.KeyCode == Enum.KeyCode.Down or input.KeyCode == Enum.KeyCode.S then
-        UH.SelectedIndex = UH.SelectedIndex + 1
-        if UH.SelectedIndex > #UH.ActiveElements then UH.SelectedIndex = 1 end
-        UpdateSelection()
+        UH.SelectedOption = UH.SelectedOption + 1
+        if UH.SelectedOption > #UH.ActiveOptionButtons then UH.SelectedOption = 1 end
+        UpdateOptionSelection()
         PlaySound()
     elseif input.KeyCode == Enum.KeyCode.Up or input.KeyCode == Enum.KeyCode.W then
-        UH.SelectedIndex = UH.SelectedIndex - 1
-        if UH.SelectedIndex < 1 then UH.SelectedIndex = #UH.ActiveElements end
-        UpdateSelection()
+        UH.SelectedOption = UH.SelectedOption - 1
+        if UH.SelectedOption < 1 then UH.SelectedOption = #UH.ActiveOptionButtons end
+        UpdateOptionSelection()
+        PlaySound()
+    elseif input.KeyCode == Enum.KeyCode.Tab then
+        UH.SelectedTab = UH.SelectedTab + 1
+        if UH.SelectedTab > #UH.Categories then UH.SelectedTab = 1 end
+        UH.CurrentCategory = UH.Categories[UH.SelectedTab]
+        UpdateTabSelection()
+        RenderOptions()
         PlaySound()
     elseif input.KeyCode == Enum.KeyCode.Return then
-        local el = UH.ActiveElements[UH.SelectedIndex]
+        local el = UH.ActiveOptionButtons[UH.SelectedOption]
         if el and el.Activate then el.Activate() end
     elseif input.KeyCode == Enum.KeyCode.Left then
-        local el = UH.ActiveElements[UH.SelectedIndex]
+        local el = UH.ActiveOptionButtons[UH.SelectedOption]
         if el and el.Left then el.Left() end
     elseif input.KeyCode == Enum.KeyCode.Right then
-        local el = UH.ActiveElements[UH.SelectedIndex]
+        local el = UH.ActiveOptionButtons[UH.SelectedOption]
         if el and el.Right then el.Right() end
     elseif input.KeyCode == Enum.KeyCode.Backspace then
-        if CurrentSubmenu then
-            BuildPage(Pages[CurrentPage])
-        end
+        RenderOptions()
     end
 end))
 
@@ -588,9 +662,5 @@ function UH:Unload()
     if ScreenGui then ScreenGui:Destroy() end
     G.UH = nil
 end
-
-local DefaultPage = UH:AddCategory("Main Menu")
-BuildPage(DefaultPage)
-CurrentPage = "Main Menu"
 
 return UH
