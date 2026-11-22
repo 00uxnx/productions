@@ -127,6 +127,165 @@ local function getGlobalFunction(name)
     return nil
 end
 
+local LucideIconData = {
+    ["user-round"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAEj0lEQVR4nO2aTWwVVRiG3wOWgn9BUqoFioQo2hB/MBGISGKIaUxYmbgDf+LfhsREN26JIerW+LNRg0bjxphoXBhtY1AsYty4MLEQI4VeKNaFYhtKgfZxMdNQp9/cO3PPOXObcJ+ki37teb/3O3Nm5pw5R2rTpk2bqxhXdUJgmaSNkrol9abhUUnjkv5wzl2s2lN0gBuAx4FPgQnymUj/Zy9wfat9ewN0AM8DY3WKzuMv4GWgs9V1NAVwD3C8icKzHAPubnU9pQB2A+cCFD/HBPBoDK/BH4LAE5I+qKN9QdK3kn6TdDqNrZPUJ2mXpLwhPyvpSefcx8HMhgZ4ALiQcxVHgWep83AjeVg+B9RyNKaA7VXWVBigGzibY/xNYEUJrRXA2zlaY0BXzFqaIi0yyyywz0NzX6qR5Y2Q3r0BNgLThtEDAbRfM3QvAreF8B4E4B3D5A/AkgDaS4AfDf23Qnj3BnDYD60dAXPsNPRrQOVTecvcNsPcTxHy/Gzkud9X13uISnrQiH0RQLeIppW7FCE6oMeIHQmgm2XIiK3xFQ3RAWuN2Gkj5ssZI7YoOsCa2U0E0M1yzojd6CsaogPGjVh3AN0s1q121lc0RAeMGbFbA+gW0bRylyJEB5wwYo8E0C2iORIhTzmAdSycr9eAjoA5lgFnMjlmAesBXD05k5SmF0GG/guG/tFQ+t4ALxkG/wRuDqDdA4wb+i+G8B4EkvX7KcPkETw+agLLsRdCNeDakDV4AzxjGAX4BripCb1VwGCO5lMRSvADWAp8nWP4OPBwCa1+4Pccra8IsMyOArASGM4xDjAA7LFGRHrF99a56qTaK1tRW2GATcDJOkUAzADngX/Sn/NprB4ngdtbXV8hgC7gUIOCyjAE3BLDa6x7aZukpQH1LkvaElAvDsAW4HDAK5/le+DeVte5AJKp6qvA5YjFz3EJOECgqbb3R0VgjaTPJDXasRmRNCDpqKRhSTVJ0+nfOpWcFbgz1emXtL6B3pCkx5xz3kvipgH6sGeAc0wB7wJbm9DeDrxH/lYbwAiwKUZtRQz2kb8VNgO8T4DVGslq8yD2DhEkq8RqOwFYW+fKjwA7I+R8qE7OE0R6TVpGOrAXKJDM4lZFzN0FfJeT+zBwTazc8028nmPgc5IDULHzdwJf5nh4JXby+7BfdYNVFD/Px/KckXCJmMdpsCc5I0Qc9nW8rMZ+JhyKlXC3kWwG8N6e8vC0C/vt0B8jmTXkDgZPVN7Xh4avwdBJNhtJplgEX2WB9Sw8nDEL3FGkfdHV4B4j9pFzLsYeYCmcc6ckfZINy/bcHMCvxgjw3psPBcnptCy/hBLvMcSt3aCWQXJKZdS4DRqeJityC1gLmYHyNuPhnEMLPTnZ3v9HkQ7YbMQWz67MFSxPdzVqVKQDNhixYwXaVc2wEdvQqFGRDrD2+msF2lWN5Wl1o0ZFOsA64jpZoF3VWKdSrmvUqEgH/J35fVqLswP+1ZVPbHNYx2rKAWwFJue9XvZ7i0YC2D/P5yRNfIrLE+4Fnibg6c9YADtSr72N/7tNmzZtrnL+AyxKHnB6Id+xAAAAAElFTkSuQmCC",
+    ["sliders-horizontal"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAADRUlEQVR4nO2bTahWRRiAn8nf/CERxH4QCQyEFpKoSFi5KheFC8PCCDEIFKJUWiZeQQmJ2kW71m5ciG4M+rkZbsSUKBFFEjUjWoRcI7sXe1ycL7zod78z59w5zvd5z7M898zM8773MGdmzvtBS0tLyxQmpOpIDcCzwHJgPvAncCqE8EeqMfoSdbr6vnrZ+/lP/Vp9IbdnI6gL1RNdAr+X2+pQbt+kqDPUkxHBj2d3bu9kqLsqBq96S12W23080ZOgOg+YMa7dT8BTNcb8HNhTo10VxkIIN2NuLE2A+hhwCHgl5v4+QeA48GYI4UavGx+J6OwjYAODEzwUrhso3HsSk4BnJq2Tj1L3mAQcSSCSi1L3qMdafQfYBMzsXJoFrIttfw9/AadrtKvCKHA4hPBlYyMYtwDqxnuNST1I1OctlrpVuKTOzu2eDHVvheD/Vtfmdk6OxUbon5LgL6ircrs2hrpEPaj+rI51gh5Rv1HfVWfldnygqHNzO7S0xNF36/vOfPEa8BKwpHP5CjAMHA0hjOZyaxx1i/pbj7fJNfWN3J6NoH5cYU2xP7dvUtStFYL/n7dyeydBnav+XiMB19U5kx1/eqTkk8DL3N0NpmQl8HiNdk8An6pnuvxtFPgqhHC9rJOYI7GVwHcUHzsGiRFgfQjhx143xRyI7GbwgofCufQYPiYBDzUxCfiM4nEaNEYo3HsSeyTW5CT4HLC9ZtsvgLNdrkdPgtlR5+R8DfYF6ts1ErAlt3dS1P0Vgt+X27cR1M0WG56JuKK+nnLMftwOzwRepdgOL+1cvkyxHT4WQhjLpNbSMhnU+RaFVFMD9VF1hzrs3e8Gt9Vf1E/UpeW9DCjqWvXXklfZLXVnbtfkqGssPorEMpTbORmdx75bvWAZL+Z2T4L6QY3gVb/P5Vy3QGIiVgELangI/AD8W6NtN9IVSKjbav5X+4FtZfHFHIhsnHQW81HqHpOAiwlEclHqPuULJeuWyk7EAWBHbJ/juAqsqNFuIqJLZZOiPm15uUw3Ho7KMQD1w4rBD6tRX6gGBnXIYuNTxrdqnXVD/6Ous/i5TLdawksWO8VpuT0bn9XVRcBqYDFwAzgfQjjX9LgtLS0tLRHcAcWILwYefOnWAAAAAElFTkSuQmCC",
+    ["crosshair"] = "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",
+    ["eye"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAFT0lEQVR4nO2aXWwVRRTHz7QNbSnUtrdRoKh8StRoBDWi0Qoa47OmLX7EiBjSSIxRo4KJJhrxHROi1PgAkjRVn9QEImJbH5AqQsWANvogH6ZIvyiglKS1Px9mLr25ndk7e+9urw/7Tza52bvnf/5ndvbsnLMjkiBBggQJEiRIkCDBjAOoBCqLqUHF7QAoE5HVInKHiKwSkdtEpF5EakWkwlx2WUTOiciQiPwkIofN0aOUmohbY+QASoCHgY+AIfLHIPAh8BBQUuy4cgIoB54F+goI2oVfgQ3ArGLHOQ2AAh4DTscQeDZOAeui0l5wDgBuFJEdItLoaTIpImdEP/Oj5lytiNSIyIIQmrpF5DmlVJ+32KgBtAKXctyxSeA74DXgfqA6gK8aWANsBg4a2yD8A2ycyZjTQquAz3KIGwLeAhYW4Oda4G1yJ9JPgNlRxhgkqgE4HCDmPPAKUBWhzyrgVeBCgN9DwIKofLqELEcnIRd2A/Ni9D8faA/wfxJYFpfzFcCfAXf9yVgc27U0ASMOLWeAm6N22ID7FfcLsDQkXz3QCDxhjkYgFZJjGe71xmmgIVyUbkdzgV6Ho/1AjSdPeq3QDUxYuCbMfy2A16sQqAU6Hdp6gbmFBl8KfOFwsAeoyM1y5W4dcvDY0AMs8eQuBz4P0FhWyAC87yD+Cs8lKXAv+dUDg8A9IQZhn4Nne77BP+ogPIb/tF9sAskXw3hmdfSjetTBE27pDCw0zrPRD1znyaGAHxyCRoGdwEvm2GXO2XAQ/5zgStbnfHWnS9kuC8klYKUXieZZ5wioHaizXJ8COhw2zSH83g6MWTg6vQYSXXLasMlXhOH51hG8UwR61tgGoSuk7xccMazPZViNnubZ2OM1elM89Ux/1Y1iufMW2xR6YZWJcR/bDA4FfGmJ4yxB+QvYZjEaBq72dW541lh4doaw32Wx9y230xzXYM9j2zKvK8kwKBORVgvXG0qpgTDORdf12Tgawv5nT04nlFJnReRNy1+tZKwN4uqzYTkXxldUzdqcPFdEme5rm+WarWEfAdEdn2zcEsL+Vsu5/jAC0FXpO5a/2pydZtxJcC/hkmAKexLMWfCgE2hxkqAxfsZiCPC8rwDD023h6AgaSCPc1mnqDOn7RUcM632MFfYKawxYFUJEi0NEB5aZgL7zrjZbUwi/dwKXLRzfBA1+NkkD9gKmH7jek0OhqzobzgMfAy+bYzfTp30aB3yFG922ps0IvkvhDLJHHIKO418MLQIGHDw+GMK/LK7GXQy1hAo+g3S7g3AfUO7JcTf5VYSDwGpPH+XA1w6e9/IK3hCX4m427MXzyy6wBF3V+eIAsMiTuxLdn7ChsIaIcRDUEusCaj15FNBsbMYtXOPo5NuE/zNfh73oAjgCzCko+AxHQU3RPmB5SL4UcB+6Ifq4+e39njccNwC/OTSdIupvBMahaxAuAE9F6jBYSzO6yWFDP3BTXI6XAiccjkG/42P7OoOeiZ8G+P8Dz7dGISLm4251pWfDZqJ6/rTPOcAW4GKA3x5i/CqVLWg27vZVGsPAVjwXTg4/i4F3cX8FSqOdYuw1AjYCf+cQN2nuzhZgLXBVAF8N8ADwOsGzLI2LwIZCYohig8QKEflARNb6mojIX6I3SIyYc3WiN0nMC6Fpv4hsUkr97q82RqCLn5Med61QnCBEcTSjAGahy+njMQR+DHia/+MmqWygV30PAm0UVgwNADvQeSGWPY0zsVGyVETukqmNkitlaqNkOnOPydRGyV4ROSIiP4rI90qpf+PWWDQAFXh+YU6QIEGCBAkSJEiQIFr8B/g1cMgRf/K4AAAAAElFTkSuQmCC",
+    ["move"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAADR0lEQVR4nO2bv28TMRzFn1FVfqjsqGvVf6GdwhC69g9AQoKpGxJlbKVuFZWQ2gkJtiIhwd6xlIU/goH/gqihLUiPoV8X6/I9+5yz75K7fqQM8Z2f/d75fE7iALfc0hokl0gutd2PViB5yv+ctt2fRiH5kZN8brtfjUDyUDFvOWy7f1kh+cZj3nLUdj+zUNF8N0MIDPtu3w6RV75bI8Fj/lIpu+hUCB7z59RvibckR50IIWD+Cckt5dgWycHchxAyL+eoAcix+Q2B5J7H/NA5rzQAOT6UOhp77bgLQHKB5DhkXs71BiDnlIUwJrmQqt93UgmVMAawaYz5FltR6myKRjaSBWCM+Qtg3ykaYUrzjqYNYeQU70tb7UNykeRioWyN5AuSy556wVugcP6yaK6F2m8MXk945/LaiawbFUCJxo7TfrMTI/WFzHpE/VoBkFxX6k/12SF6DpCGtpVDq9N0YEq0tranDaEyJVeeJH/57nlFp+4IWJY2NfKE4DE/8ZyvoJViDvAtltKGwArL20i92gGITv5lc2rzopkkANHKF0IO86KbLADRSx9CLvOinTQA0UwXQk7zop88ANGNDmHiUxXJYwDPlXOvAHwAsEJypWZfB1oZyZqyAID3AF4CuFsof0XykTHmqVto3DckvwKofYVnnDNjzIZ9cxMAyXsAfrfSpea5b4y5APJ/HzDz3AQgiZy12JemOLNXHyjMAYB3EvwD4B2AHwk6MQDwrFD2CcD3BNqr0CdBAPhSnARVPI/BMcmNoEBYP9dj8HHsY9Anli2EHAEkNe+IZgkhdQBZzDviyUNIGUBW804jSUNIFUAj5p3G+vuFiNNo574Si1oJGmNeA9CG1kMAUaOgJkNps8iR9LEy0UthTwg/Y7VqoLUVbb4W7PMPI04n+vvTmAbJ3cLEqM4LMQHwerZ3J7zdvC6mhPr+APURWTUA6o+6udof8ADASdlI8CF1TkQjG6n3Bxwoh6JDCJg/mJn9ARqssGz23QJscnmbi1AIZQF0wrwlEMKRUt6djZIWTwhXSlm3tspaPCFUYb7NW9jn7fKWyJHQjStfpGII3TRvCdwO3Rr2ZZA8Vsz3429zFvb5j5MW9vmvs7fMCP8AsSrbgv5ZO6cAAAAASUVORK5CYII=",
+    ["grid-2x2"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAADjklEQVR4nO2bzWsVVxjGnzcJmOBHMVgQF0Yo0driB1JD0XZhQV1KSrvwH/A/EER3haxEBCkU3QZLV+50YQUxmEKjFpFGSupGqUWhSL4gQZP8ujgJ3Ixn5s4cZziLex7IYt5z3vs888zMuTnvO1dKSEhI6GBYuwlAt6RPJR2UtDGA44Wk38xstkoSsEPSIUk7AjjnVjmfB+SuEzEEPOXDsQRcBfpKcPYD12vgBHgE7PmQk39Xk5A1jAM9BZy9wGTNnHPAZ1VPvpt6rrwPZwt4Rxri/B3wPu5dOVr2rv41gdMFY8MNcQ5J+sQ3kHc77vfEfpF0N4D8vKSBluN9QK+ZLbZOwq0PuzO5U5IuBXCelPRtJnZY0rPsxDwDNnlid83sWlUlwHdab0CPpD5Ji5mpvZK6M7HngZzS+wZs9s3NewQ6BsmA2AJiIxkQW0BsJANiC4iNZEBsAbGRDIgtIDY63oC8zdA/nth54PsAjqHM8bwkX3lsVq6U1bpp+Rr4NYBzlyf2b+lsYBuw3FBxYqyA905DnADbfZzeR8DM/pP0U2nHquFiwdiIJBrgHDWzV5UygE3AvZqvwuUSvBeo9+57AmwNsg3oAc7hamqhBdI5nJGnKvCeAG4C04GcS6sn/gOwoYirbV+gRVSvXCWnKmbNbDkgT0CXpI8CUheyJbeEhIQEH6osgn1ypeuqmDGzlYC8tcbsloDUehZBXK9uBNevWwr8SpoGbgEnKvAO4/qI84Gc74AJ3Fd4bi+ynYh+6m1ULgMXSvBeqZETYAzwNXraCvm5ZiEAK8CxAs7hBjgBfszj9K4BuJcTXlZ2rRzumNnxHN77ko42wLki6WMze5MdyHs+Dnlif0sKeePiK61fPIeA7ux/h7gF72Amd0bSgwDOQa3vR3ZJ+lLSrVLZwBnPbXQmQIiA257Pem9zAmz1zLsdyFlaf8dXhJIBsQXERjIgtoDYSAbEFhAbyYDYAmIjGRBbQGx0vAF5u8E5T+wkBHWtdmWOlyUteOYtSFrKaNoduAn7xhOb903MqwcMyr2n2wT+NLN9ObyPJR1oiHevmf2VDeY9As8kTTQk5EbB2PWGOCdV9YICn+P6enXiCQW9OlwvcrxmzrfAF0G2AXtwPzupA6OU6NICfbif14RWoVsxSZuTL9UXAAYkHVHOK+dt8FLSQzN7XSUJ2LLKuTOAc17SH5KmQnsSCQkJCR2B/wGDr01DxKl0zQAAAABJRU5ErkJggg==",
+    ["house"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAC00lEQVR4nO2bv2sUQRTH3/gjohIwEIka2wQUBAvRoNhYCtr5L6SzFmJj4VlrqYV2/gkWJxoEKysxRQobi6T1dyI5TT4WNzFyN7s7ezOz746bDxzc7s68+b63M+/t3HIimUwmM8YYrYGBQyJy3R6+MMZsaWlpHGAeWGGPFWBeW1cjADeBL/TzHbilrS8ZwH7gHrDjcH6XHeARcFBbb1SAGWC5xPFeloEZbd1RAC4An2o4v8s6cEVbfxDAbaBT4GDHXq9so+1HbYDDwLOSu7sGXP6vfdUseQ4c1fTJG2AO+FDizBvghKPfNPCypN8qcFbDJ2+AG7hLHHhkePYqxXaBjeEslbGFhwayUYDjKaYufkvpZAqf6ohMmrzoJtOnJfb1SiWwCGwVCPsN3BnFsXzE1CpxEcfVL5UMWOIijq9XKhmSzEzTpbLxAf11pb8hHlPuW7Ip56dvriQIELIkgQW6Ca2MV5F9GkTn6wqNa8BCUf99BUZPiUhbRGYrxt8O0B6LKg2zItK2PvXhDICIXBORyRBVQ8akdH3qoygAHx3n3kaTkx6XVpdPxQBLwIb93Kf7zN9LO47ewcGdpKet5l39S4ManwAm7PepEQrAMXvtn/4iDpRdNMZ0YoptGh/9RTlgbMgB0BagTWkOCMUmoNAt6kbFWsZxzvulb7IA2NJzV0SOBJraBFrGmAcRZPWRZAkAl0SkJeHOi7XRsjajkyoHnBsRm8kCkMJukU3XenflBSdJk2APqyKy7tl2VkTOeLYdziTo4KEx5olPQ2BRRB572g2aAWP/HJADoC1AmxwAbQHa5ABoC9AmB0BbgDY5ANoCtBn7AIRuhk7bjUsvV13nwHuPUqd/1fvLUry3jcCUiHwOGaxBpowxX30ajv0SqBOAHyLyK5WQiGyKyE/fxt4BMMb8ke4PncNOy2r1ovafpoCLInK+br+GeG+MeactIpPJZEaGv8iSv7zRTJwzAAAAAElFTkSuQmCC",
+    ["settings"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAEJ0lEQVR4nO2bz4scRRTHv28Tgpf4axaEoJCsIYj4axc0GoIIAY96SdRTjrkGPGbPkZz8G8wlLHgx10ASxXWz/jjsGgUvrh7EX7sRs0GQZN2Ph6pJemeqZ7p6urZmd+YDc5jqfvW+73VPdderGmnMmGwA+4B9uXVkATgH/OM/53Lr2VaAo3RzNIeWiRxOJT1fsS05uRIQ8ptFS64EDA3jBOQWkJvoBAAHgeeAPSkE1QHY4zUdjLWNSgDwgaQVSTclzQOtWIdN4zXMy2la8RqTODoEbHY8u5fqJAE4E3gPOFOjn5bXUGQTOFS1j5g74FFJ1tH2oqSrNZLwb8W2UrzPq15DEZPT2izABLAQuHLRdwJwAFgv2K8DByLsQ1e+zQKQZnDv4zg2CTPAJf+ZyaGhFsBjwNc9BEwm9v1NDt+dQnpdhc+BzrGiCZ/m+85z5QOCeiXhSAJ/R4Ym+IKoUBLuprgVgUnf93AEXxDWAua9oHvA2YS+znofeJ8DB9/YbxV4RtKama1VOHdS0rOSnvRNv0j63sxuVbSdNLMfBtG77fhB7D3gU2Aj8Fve8MfeIcEgmhXgMOWPzhCLwFRu3Y0AHAfWIoJvswocy61/IHATqNUawbe5BRxOqTHZbw33O/5S0suBw7clfSJp2X9/SdLbkh4JnLso6ZiZkUJnMoB3S67qJeDxwPktYK7E5lSOGAYC+Kwk+NK7DvekCCXheiqdXWKAV+RuyV7clXTFzH4NHcQ9q3+XVCyb3ZY0ZWZ/9eoY93KzIunhQvOGpCfKbHFT6Tcl9VtmWzKzr3o5n604OIGbwwenscAbgfM/6iOuaH8xYP96ybkzbK0t9GO2aD9R6GivpNkuD+Xsl/R+ybFQcWM50FbGtxX7lNewP6LvWR+rpHRl8dCIHeNr294E74sysw1J5yNs70j6sOTYb4G2mLW/FwJtwfHGa7gT0fd5H6ukdINgS9If6h4En+434cENoD8qxyDYJLiJTSdz9H8Mfhywu7YtopsEN6sLMUdgHo8reISCBziZSmfqV+EbkkIbH9YlXZa05L9PS3pLW2/7NguSju+4V2Hp/jrin5WezmHW2OnTYuA16s0IV4FXc+tvBGAKuBER/BfUWOkdanAj/CngOg8Km0XuAdeAk2xjSSxXUbQlVxR9Su6tsV0U7TlR8rbDVRRlh5fFBxU0ugsjJcG32d1LY32C392Lo2Rcoibj0nxbwOhukGDUt8gA001lHTgd6Od0ZB+9kjBdtZ+YTP2t7lLXsqQTVVZ1O3ioYlsp3ucJddcakdNaicoJMLOfJF3QgyQsql7wjVFIwqJvQtIFrzUNNLBVloY2Shb6q71Vdm//U7ZiZj/H2qTGzP6T9F0d2/Fu8dwCcjNOQCa/mxXbkpMrATcrtu1eGOU/TrZhlP86O2ZI+B9tBYYwdYCIPAAAAABJRU5ErkJggg==",
+    ["shield"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAElklEQVR4nO3bTagVZRgH8PeYei0IvYqlRFKLMLtGkdmqTViEXKQMdFO0cCFaixYVboMgw2tGYItWgUmFRIu84ldBWETesFpYi6CsRQaGX5FadvXXYubW8fjOOTPnzJy50f3DLM6ceZ7//3nej5n3K4QpTKE2YCZm1q2jr8B0DGMXzqXXrvTe9Lr1VQYswQv4STZ+wWu4u269pQBz8TTG2gSdhbHUdm7dcRQCpuFB7Eird6/4A7uxBjPqji8TGMIIjhcI7q/0yovjKcdQ3fGGEELAHKzHpwWCgG8l/cEiLMAz+Kqgj2+wCfP7HXS3Vfw03sD9bXwP4WWcKOC3P00Et+vci7fiEg7iSVxXgGsAqySvx4sF+Mp/i2A29hcQAUfxHBaWwL8w9XW0oIb9mF1GAkZyEp7EdizvmTRby/KU42ROTSNlkO5rQzCOUUn7GyghxryaBlLO0VRDFvaVQXYg4ri0Kl6CvnZN5EAZBLEEDJagvVRgsJsETOuHuMmMqQTULaBuTCWgbgF1YyoBdQuoG1MJqFtAFrAM76TXsqp4JuUsLFaEEHaHEK5Nbw1jSaPR+LlsrklXAyLBhxDC9SGEB6rgm1QJyAh+At9VwTlpEtAh+C2NRmOsCt48fcB4N3aSJa/h9OeeRqNxsc2z7YLf1mg0NuXQGdMU014MeDsyzLytg80ADjc9fwTzMp5dgfMRDnilgM7FEfudnezyNIFTkXudVmtWhhDua/p9Twjho9Yk5Cj5Z3Poa6cppv0KdJuABTnsWnFXaEpCycFnaTrdyShPAo5F7t3bwWZvCOFI5P5EEtaGcoMPIYTYx9IPXfi5ElgaaVv7c9gN4ouMtp2FbT3oPBjxt6Rbf82Or8FvLY7PyDELjHn4OmfwuTu8CM8snG3xdxblvObxYUTwIzlt89SErks+5Xgs4rP3GeEmgqciBO8WsG9XE7ou+Sb/70X8ru/VbzPBfFcvY19QYF0goyb0VPKp35skC6TNuCjju6MXor29lp5kOX0Ee7CuJF2vRnSNluG7lWhlhOh33Fg6WX5NC8SX6B+uijDWme2ohCyfnp0RPV+iURVhrLe9jErG6h20rIhogUerJG3gUIT0e8ypjPhqHYM4FtHxcWWl30Q+JL5r44PKycM/hfB+hP9P3FE1/4SIlzKq3/N94N6Uwf1i1dzNImbgs4iIy3i8Qt61kn1HrRjT7z3HuFWy86sVFyRD3bL5HnL1Bw+cwi1l8+UVtUp8i8q5MpMg2ZYXmzUax3BnDxVCsp83hvNYXYL/1RnBw8YyYugZ2JIh8BLyTGhm+d0k3uZhc5kx9AxszhBKMrE6q4CvmXizjb+eB1GVAFvbiD6Em3P4WIRP2vjZ2o9YuoZk83TWDvAzeKKN7RrZmyDH9dCc+grJyLF1iqoZb2k6CCE5WBEb2EzgLFbWGVNh4E782CaoE1iXXr+2ee4YltYdT1fADZLtrN1iVL/PA5QNyeBlo2JnC85hgz4MrvoGydrd5zmCP4zFdeutBJLTJhsk3++tOJn+N2mW7CuDZJZ5u38PTr7+n2/r3cD/8ejsFCYZ/gZad+T8MDx6bAAAAABJRU5ErkJggg==",
+    ["compass"] = "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",
+    ["map-pin"] = "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",
+    ["gamepad-2"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAFSUlEQVR4nO2aW4hVVRjH/9+go+PkjTTTyG5jgqGFhKJhalRm0KAVlOFD0L2op0jQIB8Kgl7y2Yd6iCgDB4JM8yHMzCy8EGKUlY2ZqaNT2NjopP562Pvgcp21z1l7n6MW7R+ch7P2d/l/66y19trrbKmkpKSkpKSkpKSkpOR/iBV1BCZKmiJpvKTBTVOUjwFJhyTtMbP9RQLk6gBgiqQnJN0vaWKRhBeQbklrJa02s2+bGhm4FvgAOMO/nzPAeyQjtCnFLwX+vLQ1FeI4sKTR4lde6iqawMu1asxcA4Blkl6v4btb0iZJ30s6WaiHG2eopBslzVeyIGfxkpm9ER0VWED2fF8H3Nqg8KYDzADWZ2g+A9wZG2g4cCAQ5BTw2AWuo2GAJ4GBgP5uoD0mwCsB59PAfZECZgCPAhMarqYgwKJUs8+Keo5DgaMBx5oLieO/wvE5DkxvSkUFyPghDwNDajk9EHD6Dqi70wMGAX95vu80taocAK3Aj4F6Frl2LZ7fvYFYb5rZ3xE5h0tq89quyKH5PIDpwLskm5oZef3NbEDSqsClhbWS7vZ66ywwLlLw6EBvf5JXeBprQjqFKvQB1xSM47PTtWlxjE3SDV6Mn83scI0ErWnhoyWNCpgMrlxPP7HPHncoGVEV2iXF3cYczOygpANec4f7xZ0CbUo2Fi6/ZgUHlkv6XVJv+vkpYDbPud4raR9wW4T2vZFtMfg1XAa0VlkBwwLDZXMoIjAzYBtLd4xqYDlwgmRhXZm77HNxvgxoCC/qVK/i+zLsljbQAWcBf6Rl6Wkl47aVXltMcufKjAfs9/Ifr5Xwm4DgqkWQ6kUqDx/HFF8LYAiwzYm5HfDvQALGBfLvcm0GeT7bJE312mZL6nIbzOwgME/Si5LGps2DJc31fHsl7XC+75L0WkSN9Vgoyb01TpfUKel9zy603nzlfvE7YIukxwNBurw2mdkOSY9UvpPcCXo9s+1mdndAxMUi1AFbMq2BSYEhszUmE03cB0Tkip0CoQWwIxTTdfrNcxgAhkWIGhlItr6BOuvlq7kIAm0kT7AumXsa17ErUMjtkaK6Pb/4Q4gmA8wN1LHWt/OfBaTwHInZvEjJmtAtCUnrJb0arbj5RM1/fxEMGmUEq8LMtgDXSWo3s75KO3C1pLsy8oU4LWmjmf0SaR9idqDti7peJAtMvzd0jhG/j/fjzSF5mMlLHzCnYE5LNbv0U+sswAuwOSCo1qFjVpwpQG+B4iv8AUwrkPemQKzPQrahNUBqbB2oiJggaZ2k0Xn8PEZKWkf+Pzmi7/8XpAOAUZI2SMr9DB/gKkkfpTFjiZ7/wXkNXC6px7v+g5lNqpc5nWcbVL0tlpIdZb29wT2SFgfaN0laYGanIjTs1fnP/Ugaa2bH6vm6QfYE5lHN0yGgBViTMZ83EnoOr47RmtqGWANkjdqK/5UBvz3RhTuBVgcCPVPHZ1WG8J3AiBy5R6Q+IULnfK7v8wGf1bG53UAPBQL1ANdn2C/LELwPGF8g//jUN8SyDJ8Owsf6D+bNXzkh6gkEO0Ly78sYkiE/DXg7Q+hRYHLu5Oc0TM4oCOAtYGqqYQzwVIbeQ0QewIQEPJeRPIYTwKyixTsaZqWxivJ0I8lbgA8LJD0NdDZavKOjk/BfXfXoouAO1k3elrMT+oGHm1S7q2MJcDJn8VVnBEWTtwAvkD0fK2wC/CO1pgHcDHxeR0MP8CyRv3zel6TalbwgNV/JiwlDJR1RctbXZWZf56ypEMBMSYsk3aLkTLJfyYsan6Y6TlwMHSUlJSUlJSUlJSUl/13+AVpPhjBo3dukAAAAAElFTkSuQmCC",
+    ["zap"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAC+klEQVR4nO2aP2gUQRTG30gwCQRjYuGf1k4QbGKTxtrUsbWzUPBioY1aWihCFLS3NbVyra1WErAS8RTvYmHEzoRIfhZ7wmV9M7t7NztzN9kfpMnu7Pve7sd8c7Mr0tAwFgBzgImtIzjAPNAG9oEOsBxbU1CAdQ7SBWZj6woCMA1s8z+t2NqCAKwqzQP0DoULgNeWG5C+C4CTwJ7jBmyFcMGRugs4uCoiU47jp0TkWiAt4QE2HU8/qAuCAyxZJr7eoZgLgOdKow+BteRdABwFfiiNngdmgG9JuwC4ojT4duB42i5Az/7rA8fTdQF69u8CJ3LnpekC4I7S2EvlvDRdgJ79ly3npuUC4KLS0HdAXQ0m5wIs2V8wJg0X4Mj+gnFpuICC7C8YO/kuoCD7C8bW6oJKu7DAcRG5KyIXKta5JAd/+u6KyBljzM+SdVsi8iT37y0ROWuM+V1Ry/CQ7d76YKNi3Vli/1LsW3Hf0w1YGaJ+S7lO2B1k4IuH5r9iyf6C2mPhAm1GrsJHRnjxYakfzgWOp3APWCj4O1Zj/Zs++isrImouA7eU+uHeIxB5ddav321c0LhgPF3g5SlQPKEuAPeV+l1gxkd/ZUR6z2VgGfisXLMKk+kCYIpskTQqnRpatYr25gJgxUPzkC3Xp+vo1ybciwuADU83oF2l7sgfJfUb/SQip3OH1owxT0teY1FEeiIy+OT+iMibinLei8gDY8yviuNGw+KC0usC4IYy/lXdur3BiOsC4J0ydrVu3V4Z1gXAOWXcNiEnMh8M6wLgkTLmWSjdXqnqArLs12J0KbR2L1R1AXr2fwit2ytVXICe/bdj6PZGWRcAi8BO7pw9IL+emDzKuIBJz34XZVxACtnvwuUCUsl+Fy4XkFL2u7C4wPZB5GRmvwuHC/JEy/5aP5Y2xuyIyOMSp76oU0dUSrggjex3YZkL/pFG9rvAvncIKWW/C4sL0sp+F30X5N/mrMfWFRSyFx8dsq3rNjAfW1NwAAPMxdbR0JDxFxR/dON0qJeRAAAAAElFTkSuQmCC",
+    ["terminal"] = "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAABX0lEQVR4nO3aMUpDQRjE8VkLEVSiJDYewwsoau8Z4hmsPICNeAVvINhILmGR3kZrO1ELhfe3UAvx5T3E7H6QnV8dNjPDS0hgJTMzMzOzTsAakKJzFAcMgAnQAPfAXnSmooBzfnoFDqJzFQNc81s9IwDjlgGqG+HCI8BZxwiH0fmK8AjyCJI8giSPIMkjSPIIkjyCJI8gySNI8giSev877EbnK6JjhIfobEUAI+CxZYAGWInOlxUwBKYznoBJdL6sespPgWF0xmyATeC2o/woOmM2Lu/yLu/yLu/yLu/yC6n28gNq/W0vtd4PqKe8NPN+QB3lpdb7AfWU/wYcAzdfH4eN6DzzFHbrC9iRdCJpK8Pxb5KuUkqXGc7+P2AbeJrx5TpP474sSyUKt9iXtF7gfY76XhA1wN2Cvc/fAafAS6ZHv+HzcuegL0fo1VdgWdJqhqPfU0rPGc41MzMzs4XxAWrHPS7JYjxaAAAAAElFTkSuQmCC",
+}
+
+
+local LucideIconCache = {}
+local LucideIconNames = {}
+for iconName in pairs(LucideIconData) do
+    LucideIconNames[#LucideIconNames + 1] = iconName
+end
+table.sort(LucideIconNames)
+
+local Base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+local Base64Lookup = {}
+for index = 1, #Base64Alphabet do
+    Base64Lookup[Base64Alphabet:sub(index, index)] = index - 1
+end
+
+local function decodeBase64(data)
+    local output = {}
+    local buffer = 0
+    local bitCount = 0
+    for index = 1, #data do
+        local character = data:sub(index, index)
+        if character == "=" then
+            break
+        end
+        local value = Base64Lookup[character]
+        if value then
+            buffer = buffer * 64 + value
+            bitCount = bitCount + 6
+            if bitCount >= 8 then
+                bitCount = bitCount - 8
+                local byte = math.floor(buffer / (2 ^ bitCount)) % 256
+                output[#output + 1] = string.char(byte)
+                buffer = buffer % (2 ^ bitCount)
+            end
+        end
+    end
+    return table.concat(output)
+end
+
+local function getLucideAsset(iconName)
+    if LucideIconCache[iconName] then
+        return LucideIconCache[iconName]
+    end
+    local assetFunction = getGlobalFunction("getcustomasset") or getGlobalFunction("getsynasset")
+    local writeFileFunction = getGlobalFunction("writefile")
+    if not assetFunction or not writeFileFunction then
+        return nil
+    end
+    local path = "UnnamedHook/Icons/" .. iconName .. ".png"
+    local isFileFunction = getGlobalFunction("isfile")
+    local makeFolderFunction = getGlobalFunction("makefolder")
+    if makeFolderFunction then
+        pcall(makeFolderFunction, "UnnamedHook")
+        pcall(makeFolderFunction, "UnnamedHook/Icons")
+    end
+    local exists = false
+    if isFileFunction then
+        local success, result = pcall(isFileFunction, path)
+        exists = success and result == true
+    end
+    if not exists then
+        local encoded = LucideIconData[iconName]
+        if not encoded then
+            return nil
+        end
+        local success, bytes = pcall(decodeBase64, encoded)
+        if not success or type(bytes) ~= "string" or #bytes == 0 then
+            return nil
+        end
+        local written = pcall(writeFileFunction, path, bytes)
+        if not written then
+            return nil
+        end
+    end
+    local success, asset = pcall(assetFunction, path)
+    if success and type(asset) == "string" then
+        LucideIconCache[iconName] = asset
+        return asset
+    end
+    return nil
+end
+
+local TabIconDefaults = {
+    player = "user-round",
+    players = "user-round",
+    interface = "sliders-horizontal",
+    settings = "settings",
+    combat = "crosshair",
+    aim = "crosshair",
+    visual = "eye",
+    visuals = "eye",
+    movement = "move",
+    misc = "grid-2x2",
+    main = "house",
+    home = "house",
+    protection = "shield",
+    security = "shield",
+    world = "compass",
+    teleport = "map-pin",
+    teleports = "map-pin",
+    game = "gamepad-2",
+    gameplay = "gamepad-2",
+    exploits = "zap",
+    developer = "terminal",
+    debug = "terminal"
+}
+
+local function resolveLucideIcon(tabName, requestedIcon)
+    local requested = tostring(requestedIcon or ""):lower():gsub("^lucide:", "")
+    if LucideIconData[requested] then
+        return requested
+    end
+    local normalizedName = tostring(tabName or ""):lower():gsub("[^%w]+", "")
+    return TabIconDefaults[normalizedName] or "grid-2x2"
+end
+
+local function getGuiParent()
+    local getHuiFunction = getGlobalFunction("gethui")
+    if getHuiFunction then
+        local success, parent = pcall(getHuiFunction)
+        if success and parent then
+            return parent
+        end
+    end
+    local success, coreGui = pcall(function()
+        return game:GetService("CoreGui")
+    end)
+    if success and coreGui then
+        local probe = Instance.new("Folder")
+        local canParent = pcall(function()
+            probe.Parent = coreGui
+        end)
+        probe:Destroy()
+        if canParent then
+            return coreGui
+        end
+    end
+    if not Player then
+        error("Unnamed Hook must be run on the client")
+    end
+    return Player:WaitForChild("PlayerGui")
+end
+
 function Library:BindTheme(callback)
     table.insert(self.ThemeCallbacks, callback)
     callback(self.Theme)
@@ -723,10 +882,17 @@ function Section:AddKeyPicker(label, settings)
         if type(value) == "string" then
             value = Enum.KeyCode[value] or Enum.KeyCode.Unknown
         end
-        self.Value = value or Enum.KeyCode.Unknown
+        local nextValue = value or Enum.KeyCode.Unknown
+        local changed = self.Value ~= nextValue
+        self.Value = nextValue
         keyButton.Text = self.Value == Enum.KeyCode.Unknown and "None" or self.Value.Name
-        if not silent and settings.Callback then
-            task.spawn(settings.Callback, self.Value)
+        if not silent and changed then
+            if settings.Callback then
+                task.spawn(settings.Callback, self.Value)
+            end
+            if settings.ChangedCallback then
+                task.spawn(settings.ChangedCallback, self.Value)
+            end
         end
     end
     function control:Activate()
@@ -744,7 +910,7 @@ function Section:AddKeyPicker(label, settings)
     end)
     control:SetValue(settings.Default or Enum.KeyCode.Unknown, true)
     Library.Options[settings.Flag or makeFlag(label)] = control
-    control.KeyCallback = settings.ChangedCallback or settings.OnKey
+    control.KeyCallback = settings.OnKey
     Library:BindTheme(function(theme)
         keyButton.BackgroundColor3 = theme.PanelLight
         keyButton.TextColor3 = theme.Text
@@ -1302,7 +1468,7 @@ Window.__index = Window
 
 function Library:CreateWindow(settings)
     settings = settings or {}
-    local guiParent = Player:WaitForChild("PlayerGui")
+    local guiParent = getGuiParent()
     local gui = create("ScreenGui", {
         Name = "UnnamedHookUI",
         ResetOnSpawn = false,
@@ -1310,6 +1476,10 @@ function Library:CreateWindow(settings)
         ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
         DisplayOrder = 1000
     }, guiParent)
+    local protectGuiFunction = getGlobalFunction("protectgui") or getGlobalFunction("protect_gui")
+    if protectGuiFunction then
+        pcall(protectGuiFunction, gui)
+    end
     local window = setmetatable({
         Gui = gui,
         Tabs = {},
@@ -1481,8 +1651,10 @@ function Library:CreateWindow(settings)
     window.Pages = pages
 
     function window:AddTab(name, icon)
+        local tabNameValue = tostring(name)
+        local iconName = resolveLucideIcon(tabNameValue, icon)
         local tabButton = create("TextButton", {
-            Name = "Tab_" .. tostring(name),
+            Name = "Tab_" .. tabNameValue,
             Size = UDim2.new(1, 0, 0, 34),
             BackgroundColor3 = Library.Theme.Panel,
             BorderSizePixel = 0,
@@ -1492,28 +1664,64 @@ function Library:CreateWindow(settings)
             ZIndex = 2
         }, self.TabList)
         addCorner(tabButton, 3)
-        local marker = create("Frame", {
-            Name = "Marker",
-            Position = UDim2.fromOffset(0, 5),
-            Size = UDim2.new(0, 3, 1, -10),
-            BackgroundColor3 = Library.Theme.Accent,
-            BorderSizePixel = 0,
+        local marker = create("TextLabel", {
+            Name = "SelectionMarker",
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(7, 0),
+            Size = UDim2.fromOffset(15, 34),
+            Font = Enum.Font.GothamBold,
+            Text = "",
+            TextColor3 = Library.Theme.Accent,
+            TextSize = 15,
+            TextXAlignment = Enum.TextXAlignment.Center,
             Visible = false,
-            ZIndex = 3
+            ZIndex = 4
         }, tabButton)
-        addCorner(marker, 2)
         local tabName = create("TextLabel", {
             Name = "TabName",
             BackgroundTransparency = 1,
-            Position = UDim2.fromOffset(12, 0),
-            Size = UDim2.new(1, -18, 1, 0),
+            Position = UDim2.fromOffset(23, 0),
+            Size = UDim2.new(1, -56, 1, 0),
             Font = Enum.Font.GothamSemibold,
-            Text = (icon and tostring(icon) .. "   " or "") .. tostring(name):upper(),
+            Text = tabNameValue,
             TextColor3 = Library.Theme.Muted,
-            TextSize = 10,
+            TextSize = 11,
             TextXAlignment = Enum.TextXAlignment.Left,
+            TextTruncate = Enum.TextTruncate.AtEnd,
             ZIndex = 3
         }, tabButton)
+        local tabIcon = create("ImageLabel", {
+            Name = "LucideIcon",
+            BackgroundTransparency = 1,
+            AnchorPoint = Vector2.new(1, 0.5),
+            Position = UDim2.new(1, -9, 0.5, 0),
+            Size = UDim2.fromOffset(15, 15),
+            Image = "",
+            ImageColor3 = Library.Theme.Muted,
+            ScaleType = Enum.ScaleType.Fit,
+            ZIndex = 4
+        }, tabButton)
+        local iconFallback = create("TextLabel", {
+            Name = "LucideFallback",
+            BackgroundTransparency = 1,
+            AnchorPoint = Vector2.new(1, 0.5),
+            Position = UDim2.new(1, -9, 0.5, 0),
+            Size = UDim2.fromOffset(15, 15),
+            Font = Enum.Font.Gotham,
+            Text = "◇",
+            TextColor3 = Library.Theme.Muted,
+            TextSize = 13,
+            Visible = true,
+            ZIndex = 4
+        }, tabButton)
+        task.spawn(function()
+            local asset = getLucideAsset(iconName)
+            if asset and tabIcon.Parent then
+                tabIcon.Image = asset
+                tabIcon.Visible = true
+                iconFallback.Visible = false
+            end
+        end)
         local content = create("ScrollingFrame", {
             Name = "Content_" .. tostring(name),
             BackgroundTransparency = 1,
@@ -1531,7 +1739,7 @@ function Library:CreateWindow(settings)
         layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
             content.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 8)
         end)
-        local tab = setmetatable({ Window = self, Name = tostring(name), Button = tabButton, Marker = marker, TabName = tabName, Content = content, Controls = {}, SelectedIndex = 1 }, Tab)
+        local tab = setmetatable({ Window = self, Name = tabNameValue, IconName = iconName, Button = tabButton, Marker = marker, TabName = tabName, Icon = tabIcon, IconFallback = iconFallback, Content = content, Controls = {}, SelectedIndex = 1 }, Tab)
         table.insert(self.Tabs, tab)
         tabButton.Activated:Connect(function()
             self:SelectTab(tab)
@@ -1539,7 +1747,9 @@ function Library:CreateWindow(settings)
         Library:BindTheme(function(theme)
             tabButton.BackgroundColor3 = self.CurrentTab == tab and theme.RowSelected or theme.Panel
             tabName.TextColor3 = self.CurrentTab == tab and theme.Text or theme.Muted
-            marker.BackgroundColor3 = theme.Accent
+            marker.TextColor3 = theme.Accent
+            tabIcon.ImageColor3 = self.CurrentTab == tab and theme.Accent or theme.Muted
+            iconFallback.TextColor3 = self.CurrentTab == tab and theme.Accent or theme.Muted
             content.ScrollBarImageColor3 = theme.Accent
         end)
         if #self.Tabs == 1 then
@@ -1572,8 +1782,11 @@ function Library:CreateWindow(settings)
             local active = item == tab
             item.Content.Visible = active
             item.Marker.Visible = active
+            item.Marker.Text = active and ">" or ""
             item.Button.BackgroundColor3 = active and Library.Theme.RowSelected or Library.Theme.Panel
             item.TabName.TextColor3 = active and Library.Theme.Text or Library.Theme.Muted
+            item.Icon.ImageColor3 = active and Library.Theme.Accent or Library.Theme.Muted
+            item.IconFallback.TextColor3 = active and Library.Theme.Accent or Library.Theme.Muted
         end
         self.PageTitle.Text = tab.Name:upper()
         self.PageSubtitle.Text = "Use the arrow keys to navigate and enter to confirm"
@@ -1865,4 +2078,5 @@ function Library:Unload()
 end
 
 Library.Themes = Themes
+Library.LucideIcons = LucideIconNames
 return Library
