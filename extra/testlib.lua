@@ -15,16 +15,19 @@ Library.Unloaded = false
 local Player = Players.LocalPlayer
 local Themes = {
     GTA = {
-        Background = Color3.fromRGB(15, 17, 19),
-        Panel = Color3.fromRGB(23, 26, 29),
-        PanelLight = Color3.fromRGB(31, 35, 39),
-        Row = Color3.fromRGB(27, 30, 33),
-        RowSelected = Color3.fromRGB(48, 54, 57),
-        Border = Color3.fromRGB(57, 63, 67),
-        Text = Color3.fromRGB(239, 241, 239),
-        Muted = Color3.fromRGB(151, 159, 161),
-        Accent = Color3.fromRGB(112, 190, 105),
-        AccentDark = Color3.fromRGB(63, 130, 67),
+        Background = Color3.fromRGB(8, 10, 13),
+        Panel = Color3.fromRGB(12, 15, 19),
+        PanelLight = Color3.fromRGB(27, 32, 39),
+        Row = Color3.fromRGB(17, 21, 26),
+        RowSelected = Color3.fromRGB(18, 91, 185),
+        Border = Color3.fromRGB(65, 73, 83),
+        Text = Color3.fromRGB(244, 247, 250),
+        Muted = Color3.fromRGB(165, 173, 182),
+        Accent = Color3.fromRGB(32, 116, 218),
+        AccentDark = Color3.fromRGB(18, 83, 164),
+        Header = Color3.fromRGB(8, 72, 153),
+        HeaderText = Color3.fromRGB(255, 255, 255),
+        SelectedText = Color3.fromRGB(255, 255, 255),
         Danger = Color3.fromRGB(211, 83, 76)
     },
     Midnight = {
@@ -32,12 +35,15 @@ local Themes = {
         Panel = Color3.fromRGB(20, 25, 37),
         PanelLight = Color3.fromRGB(29, 36, 52),
         Row = Color3.fromRGB(24, 30, 44),
-        RowSelected = Color3.fromRGB(41, 53, 76),
+        RowSelected = Color3.fromRGB(41, 83, 137),
         Border = Color3.fromRGB(57, 70, 96),
         Text = Color3.fromRGB(236, 241, 250),
         Muted = Color3.fromRGB(144, 157, 180),
         Accent = Color3.fromRGB(91, 161, 255),
         AccentDark = Color3.fromRGB(54, 112, 193),
+        Header = Color3.fromRGB(34, 82, 150),
+        HeaderText = Color3.fromRGB(255, 255, 255),
+        SelectedText = Color3.fromRGB(255, 255, 255),
         Danger = Color3.fromRGB(220, 83, 92)
     },
     Crimson = {
@@ -45,12 +51,15 @@ local Themes = {
         Panel = Color3.fromRGB(29, 21, 24),
         PanelLight = Color3.fromRGB(40, 29, 33),
         Row = Color3.fromRGB(33, 24, 28),
-        RowSelected = Color3.fromRGB(57, 37, 43),
+        RowSelected = Color3.fromRGB(133, 43, 62),
         Border = Color3.fromRGB(80, 53, 61),
         Text = Color3.fromRGB(247, 239, 241),
         Muted = Color3.fromRGB(169, 145, 151),
         Accent = Color3.fromRGB(226, 83, 100),
         AccentDark = Color3.fromRGB(154, 48, 63),
+        Header = Color3.fromRGB(115, 34, 52),
+        HeaderText = Color3.fromRGB(255, 255, 255),
+        SelectedText = Color3.fromRGB(255, 255, 255),
         Danger = Color3.fromRGB(255, 105, 105)
     }
 }
@@ -498,10 +507,11 @@ local function addRow(section, labelText, selectable)
     local row = create("Frame", {
         Name = "OptionRow",
         BackgroundColor3 = theme.Row,
+        BackgroundTransparency = 0.04,
         BorderSizePixel = 0,
-        Size = UDim2.new(1, -4, 0, 34)
+        Size = UDim2.new(1, -4, 0, 31)
     }, section.Container)
-    addCorner(row, 3)
+    addCorner(row, 1)
     local accent = create("Frame", {
         Name = "SelectionBar",
         BackgroundColor3 = theme.Accent,
@@ -545,7 +555,8 @@ local function addRow(section, labelText, selectable)
         self.Focused = state
         self.Accent.Visible = state and self.Window.SelectionMode == "Normal"
         tween(self.Row, {
-            BackgroundColor3 = state and Library.Theme.RowSelected or Library.Theme.Row
+            BackgroundColor3 = state and Library.Theme.RowSelected or Library.Theme.Row,
+            BackgroundTransparency = state and 0 or 0.04
         }, 0.1)
     end
     function control:SetLabel(value)
@@ -1371,27 +1382,28 @@ function Tab:AddSection(name)
     local sectionFrame = create("Frame", {
         Name = "Section",
         BackgroundColor3 = Library.Theme.Panel,
+        BackgroundTransparency = 0.08,
         BorderSizePixel = 0,
-        Size = UDim2.new(1, -8, 0, 36)
+        Size = UDim2.new(1, -8, 0, 34)
     }, self.Content)
-    addCorner(sectionFrame, 4)
+    addCorner(sectionFrame, 1)
     addStroke(sectionFrame)
     local heading = create("TextLabel", {
         Name = "Heading",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(10, 0),
-        Size = UDim2.new(1, -20, 0, 28),
+        Position = UDim2.fromOffset(9, 0),
+        Size = UDim2.new(1, -18, 0, 25),
         Font = Enum.Font.GothamBold,
-        Text = tostring(name),
-        TextColor3 = Library.Theme.Accent,
-        TextSize = 11,
+        Text = tostring(name):upper(),
+        TextColor3 = Library.Theme.Text,
+        TextSize = 10,
         TextXAlignment = Enum.TextXAlignment.Left
     }, sectionFrame)
     local container = create("Frame", {
         Name = "Options",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(5, 30),
-        Size = UDim2.new(1, -10, 0, 0),
+        Position = UDim2.fromOffset(4, 26),
+        Size = UDim2.new(1, -8, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y
     }, sectionFrame)
     local layout = create("UIListLayout", {
@@ -1400,7 +1412,7 @@ function Tab:AddSection(name)
     }, container)
     local section = setmetatable({ Window = self.Window, Tab = self, Frame = sectionFrame, Container = container, Layout = layout }, Section)
     local function updateSize()
-        sectionFrame.Size = UDim2.new(1, -8, 0, 36 + container.AbsoluteSize.Y)
+        sectionFrame.Size = UDim2.new(1, -8, 0, 30 + container.AbsoluteSize.Y)
     end
     container.ChildAdded:Connect(updateSize)
     container.ChildRemoved:Connect(updateSize)
@@ -1500,49 +1512,50 @@ function Library:CreateWindow(settings)
 
     local main = create("Frame", {
         Name = "Main",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, 0.5),
-        Size = settings.Size or UDim2.fromOffset(690, 448),
+        AnchorPoint = Vector2.new(0, 0),
+        Position = settings.Position or UDim2.fromOffset(22, 48),
+        Size = settings.Size or UDim2.fromOffset(670, 438),
         BackgroundColor3 = Library.Theme.Background,
+        BackgroundTransparency = 0.12,
         BorderSizePixel = 0
     }, gui)
     window.Main = main
-    addCorner(main, 6)
+    addCorner(main, 2)
     addStroke(main, Library.Theme.Border)
 
     local topbar = create("Frame", {
         Name = "Topbar",
-        Size = UDim2.new(1, 0, 0, 43),
-        BackgroundColor3 = Library.Theme.Panel,
+        Size = UDim2.new(1, 0, 0, 42),
+        BackgroundColor3 = Library.Theme.Header or Library.Theme.Panel,
         BorderSizePixel = 0,
         Active = true
     }, main)
-    addCorner(topbar, 6)
+    addCorner(topbar, 2)
     local topbarCover = create("Frame", {
-        BackgroundColor3 = Library.Theme.Panel,
+        BackgroundColor3 = Library.Theme.Header or Library.Theme.Panel,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -8),
+        Position = UDim2.new(0, 0, 1, -7),
         Size = UDim2.new(1, 0, 0, 8)
     }, topbar)
     local logo = create("TextLabel", {
         Name = "Logo",
         BackgroundTransparency = 1,
         Position = UDim2.fromOffset(16, 0),
-        Size = UDim2.fromOffset(34, 43),
+        Size = UDim2.fromOffset(42, 42),
         Font = Enum.Font.GothamBlack,
         Text = "UH",
-        TextColor3 = Library.Theme.Accent,
-        TextSize = 19,
+        TextColor3 = Library.Theme.HeaderText or Library.Theme.Text,
+        TextSize = 18,
         TextXAlignment = Enum.TextXAlignment.Left
     }, topbar)
     local title = create("TextLabel", {
         Name = "Title",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(55, 0),
-        Size = UDim2.new(0.6, -55, 1, 0),
+        Position = UDim2.fromOffset(48, 0),
+        Size = UDim2.new(0.6, -48, 1, 0),
         Font = Enum.Font.GothamBold,
         Text = tostring(window.Title):upper(),
-        TextColor3 = Library.Theme.Text,
+        TextColor3 = Library.Theme.HeaderText or Library.Theme.Text,
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left
     }, topbar)
@@ -1551,19 +1564,20 @@ function Library:CreateWindow(settings)
         BackgroundTransparency = 1,
         AnchorPoint = Vector2.new(1, 0),
         Position = UDim2.new(1, -14, 0, 0),
-        Size = UDim2.fromOffset(180, 43),
-        Font = Enum.Font.Gotham,
-        Text = "UNNAMED HOOK  /  CLIENT",
-        TextColor3 = Library.Theme.Muted,
+        Size = UDim2.fromOffset(205, 42),
+        Font = Enum.Font.GothamSemibold,
+        Text = "INTERACTION MENU  /  CLIENT",
+        TextColor3 = Library.Theme.HeaderText or Library.Theme.Text,
         TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Right
     }, topbar)
 
     local sidebar = create("Frame", {
         Name = "Sidebar",
-        Position = UDim2.fromOffset(0, 43),
-        Size = UDim2.new(0, 158, 1, -43),
+        Position = UDim2.fromOffset(0, 42),
+        Size = UDim2.new(0, 178, 1, -42),
         BackgroundColor3 = Library.Theme.Panel,
+        BackgroundTransparency = 0.08,
         BorderSizePixel = 0
     }, main)
     local sidebarLine = create("Frame", {
@@ -1575,17 +1589,17 @@ function Library:CreateWindow(settings)
     local tabList = create("Frame", {
         Name = "TabList",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(8, 12),
-        Size = UDim2.new(1, -16, 1, -52)
+        Position = UDim2.fromOffset(7, 10),
+        Size = UDim2.new(1, -14, 1, -54)
     }, sidebar)
-    create("UIListLayout", { Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder }, tabList)
+    create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }, tabList)
     local sidebarFooter = create("TextLabel", {
         Name = "Footer",
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 10, 1, -32),
-        Size = UDim2.new(1, -20, 0, 20),
+        Position = UDim2.new(0, 9, 1, -30),
+        Size = UDim2.new(1, -18, 0, 18),
         Font = Enum.Font.Gotham,
-        Text = "UH  •  BUILD 01",
+        Text = "UNNAMED HOOK  •  UH",
         TextColor3 = Library.Theme.Muted,
         TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Left
@@ -1593,27 +1607,27 @@ function Library:CreateWindow(settings)
 
     local pageHolder = create("Frame", {
         Name = "PageHolder",
-        Position = UDim2.fromOffset(158, 43),
-        Size = UDim2.new(1, -158, 1, -75),
+        Position = UDim2.fromOffset(178, 42),
+        Size = UDim2.new(1, -178, 1, -72),
         BackgroundTransparency = 1,
         ClipsDescendants = true
     }, main)
     local pageTitle = create("TextLabel", {
         Name = "PageTitle",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(16, 6),
-        Size = UDim2.new(1, -32, 0, 28),
+        Position = UDim2.fromOffset(14, 5),
+        Size = UDim2.new(1, -28, 0, 25),
         Font = Enum.Font.GothamBold,
         Text = "SELECT A CATEGORY",
         TextColor3 = Library.Theme.Text,
-        TextSize = 14,
+        TextSize = 13,
         TextXAlignment = Enum.TextXAlignment.Left
     }, pageHolder)
     local pageSubtitle = create("TextLabel", {
         Name = "PageSubtitle",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(16, 32),
-        Size = UDim2.new(1, -32, 0, 18),
+        Position = UDim2.fromOffset(14, 29),
+        Size = UDim2.new(1, -28, 0, 16),
         Font = Enum.Font.Gotham,
         Text = "Choose an option using the selection keys",
         TextColor3 = Library.Theme.Muted,
@@ -1623,14 +1637,15 @@ function Library:CreateWindow(settings)
     local pages = create("Frame", {
         Name = "Pages",
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(12, 56),
-        Size = UDim2.new(1, -24, 1, -63)
+        Position = UDim2.fromOffset(10, 51),
+        Size = UDim2.new(1, -20, 1, -57)
     }, pageHolder)
     local footer = create("Frame", {
         Name = "NavigationFooter",
-        Position = UDim2.new(0, 158, 1, -32),
-        Size = UDim2.new(1, -158, 0, 32),
+        Position = UDim2.new(0, 178, 1, -30),
+        Size = UDim2.new(1, -178, 0, 30),
         BackgroundColor3 = Library.Theme.Panel,
+        BackgroundTransparency = 0.06,
         BorderSizePixel = 0
     }, main)
     local footerText = create("TextLabel", {
@@ -1638,7 +1653,7 @@ function Library:CreateWindow(settings)
         Position = UDim2.fromOffset(14, 0),
         Size = UDim2.new(1, -28, 1, 0),
         Font = Enum.Font.Gotham,
-        Text = "↑  ↓  SELECT     ←  →  ADJUST     ENTER  CONFIRM     RIGHT SHIFT  HIDE",
+        Text = "↑  ↓  SELECT     ←  →  ADJUST     ENTER  OPEN     RIGHT SHIFT  CLOSE",
         TextColor3 = Library.Theme.Muted,
         TextSize = 9,
         TextXAlignment = Enum.TextXAlignment.Left
@@ -1655,24 +1670,25 @@ function Library:CreateWindow(settings)
         local iconName = resolveLucideIcon(tabNameValue, icon)
         local tabButton = create("TextButton", {
             Name = "Tab_" .. tabNameValue,
-            Size = UDim2.new(1, 0, 0, 34),
+            Size = UDim2.new(1, 0, 0, 29),
             BackgroundColor3 = Library.Theme.Panel,
+            BackgroundTransparency = 0.08,
             BorderSizePixel = 0,
             AutoButtonColor = false,
             Font = Enum.Font.GothamSemibold,
             Text = "",
             ZIndex = 2
         }, self.TabList)
-        addCorner(tabButton, 3)
+        addCorner(tabButton, 1)
         local marker = create("TextLabel", {
             Name = "SelectionMarker",
             BackgroundTransparency = 1,
             Position = UDim2.fromOffset(7, 0),
-            Size = UDim2.fromOffset(15, 34),
+            Size = UDim2.fromOffset(15, 29),
             Font = Enum.Font.GothamBold,
             Text = "",
             TextColor3 = Library.Theme.Accent,
-            TextSize = 15,
+            TextSize = 16,
             TextXAlignment = Enum.TextXAlignment.Center,
             Visible = false,
             ZIndex = 4
@@ -1680,7 +1696,7 @@ function Library:CreateWindow(settings)
         local tabName = create("TextLabel", {
             Name = "TabName",
             BackgroundTransparency = 1,
-            Position = UDim2.fromOffset(23, 0),
+            Position = UDim2.fromOffset(24, 0),
             Size = UDim2.new(1, -56, 1, 0),
             Font = Enum.Font.GothamSemibold,
             Text = tabNameValue,
@@ -1694,8 +1710,8 @@ function Library:CreateWindow(settings)
             Name = "LucideIcon",
             BackgroundTransparency = 1,
             AnchorPoint = Vector2.new(1, 0.5),
-            Position = UDim2.new(1, -9, 0.5, 0),
-            Size = UDim2.fromOffset(15, 15),
+            Position = UDim2.new(1, -8, 0.5, 0),
+            Size = UDim2.fromOffset(13, 13),
             Image = "",
             ImageColor3 = Library.Theme.Muted,
             ScaleType = Enum.ScaleType.Fit,
@@ -1705,8 +1721,8 @@ function Library:CreateWindow(settings)
             Name = "LucideFallback",
             BackgroundTransparency = 1,
             AnchorPoint = Vector2.new(1, 0.5),
-            Position = UDim2.new(1, -9, 0.5, 0),
-            Size = UDim2.fromOffset(15, 15),
+            Position = UDim2.new(1, -8, 0.5, 0),
+            Size = UDim2.fromOffset(13, 13),
             Font = Enum.Font.Gotham,
             Text = "◇",
             TextColor3 = Library.Theme.Muted,
@@ -1745,11 +1761,11 @@ function Library:CreateWindow(settings)
             self:SelectTab(tab)
         end)
         Library:BindTheme(function(theme)
-            tabButton.BackgroundColor3 = self.CurrentTab == tab and theme.RowSelected or theme.Panel
-            tabName.TextColor3 = self.CurrentTab == tab and theme.Text or theme.Muted
-            marker.TextColor3 = theme.Accent
-            tabIcon.ImageColor3 = self.CurrentTab == tab and theme.Accent or theme.Muted
-            iconFallback.TextColor3 = self.CurrentTab == tab and theme.Accent or theme.Muted
+            tabButton.BackgroundColor3 = self.CurrentTab == tab and theme.Accent or theme.Panel
+            tabName.TextColor3 = self.CurrentTab == tab and (theme.SelectedText or theme.Text) or theme.Muted
+            marker.TextColor3 = self.CurrentTab == tab and (theme.SelectedText or theme.Text) or theme.Accent
+            tabIcon.ImageColor3 = self.CurrentTab == tab and (theme.SelectedText or theme.Text) or theme.Muted
+            iconFallback.TextColor3 = self.CurrentTab == tab and (theme.SelectedText or theme.Text) or theme.Muted
             content.ScrollBarImageColor3 = theme.Accent
         end)
         if #self.Tabs == 1 then
@@ -1783,13 +1799,14 @@ function Library:CreateWindow(settings)
             item.Content.Visible = active
             item.Marker.Visible = active
             item.Marker.Text = active and ">" or ""
-            item.Button.BackgroundColor3 = active and Library.Theme.RowSelected or Library.Theme.Panel
-            item.TabName.TextColor3 = active and Library.Theme.Text or Library.Theme.Muted
-            item.Icon.ImageColor3 = active and Library.Theme.Accent or Library.Theme.Muted
-            item.IconFallback.TextColor3 = active and Library.Theme.Accent or Library.Theme.Muted
+            item.Marker.TextColor3 = active and (Library.Theme.SelectedText or Library.Theme.Text) or Library.Theme.Accent
+            item.Button.BackgroundColor3 = active and Library.Theme.Accent or Library.Theme.Panel
+            item.TabName.TextColor3 = active and (Library.Theme.SelectedText or Library.Theme.Text) or Library.Theme.Muted
+            item.Icon.ImageColor3 = active and (Library.Theme.SelectedText or Library.Theme.Text) or Library.Theme.Muted
+            item.IconFallback.TextColor3 = active and (Library.Theme.SelectedText or Library.Theme.Text) or Library.Theme.Muted
         end
         self.PageTitle.Text = tab.Name:upper()
-        self.PageSubtitle.Text = "Use the arrow keys to navigate and enter to confirm"
+        self.PageSubtitle.Text = "SELECT A CATEGORY  /  USE THE ARROW KEYS TO NAVIGATE"
         if #tab.Controls > 0 then
             tab:FocusControl(math.clamp(tab.SelectedIndex or 1, 1, #tab.Controls))
         else
@@ -1806,7 +1823,7 @@ function Library:CreateWindow(settings)
             self.SelectionMode = "Normal"
         end
         Library.SelectionMode = self.SelectionMode
-        self.FooterText.Text = self.SelectionMode == "Normal" and "↑  ↓  SELECT     ←  →  ADJUST     ENTER  CONFIRM     RIGHT SHIFT  HIDE" or "MOUSE  SELECT     CLICK  OPTIONS     RIGHT SHIFT  HIDE"
+        self.FooterText.Text = self.SelectionMode == "Normal" and "↑  ↓  SELECT     ←  →  ADJUST     ENTER  OPEN     RIGHT SHIFT  CLOSE" or "MOUSE  SELECT     CLICK  OPTIONS     RIGHT SHIFT  CLOSE"
         for _, tab in ipairs(self.Tabs) do
             for _, control in ipairs(tab.Controls) do
                 control.Accent.Visible = control.Focused and self.SelectionMode == "Normal"
@@ -1838,8 +1855,8 @@ function Library:CreateWindow(settings)
         end
         local watermark = create("Frame", {
             Name = "UH_Watermark",
-            Position = UDim2.fromOffset(14, 14),
-            Size = UDim2.fromOffset(220, 28),
+            Position = UDim2.fromOffset(22, 12),
+            Size = UDim2.fromOffset(255, 27),
             BackgroundColor3 = Library.Theme.Panel,
             BorderSizePixel = 0
         }, self.Gui)
@@ -2027,11 +2044,11 @@ function Library:CreateWindow(settings)
 
     Library:BindTheme(function(theme)
         main.BackgroundColor3 = theme.Background
-        topbar.BackgroundColor3 = theme.Panel
-        topbarCover.BackgroundColor3 = theme.Panel
-        logo.TextColor3 = theme.Accent
-        title.TextColor3 = theme.Text
-        topHint.TextColor3 = theme.Muted
+        topbar.BackgroundColor3 = theme.Header or theme.Panel
+        topbarCover.BackgroundColor3 = theme.Header or theme.Panel
+        logo.TextColor3 = theme.HeaderText or theme.Text
+        title.TextColor3 = theme.HeaderText or theme.Text
+        topHint.TextColor3 = theme.HeaderText or theme.Text
         sidebar.BackgroundColor3 = theme.Panel
         sidebarLine.BackgroundColor3 = theme.Border
         sidebarFooter.TextColor3 = theme.Muted
@@ -2047,7 +2064,7 @@ function Library:CreateWindow(settings)
 
     window:SetSelectionMode(window.SelectionMode)
     if settings.Watermark ~= false then
-        window:CreateWatermark(settings.WatermarkText or "UNNAMED HOOK  •  UH")
+        window:CreateWatermark(settings.WatermarkText or "UNNAMED HOOK")
     end
     return window
 end
@@ -2079,4 +2096,6 @@ end
 
 Library.Themes = Themes
 Library.LucideIcons = LucideIconNames
+Library.Version = "3.1.0"
+Library.Style = "GTA_INTERACTION"
 return Library
